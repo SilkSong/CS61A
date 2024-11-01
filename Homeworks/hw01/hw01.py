@@ -20,6 +20,7 @@ def a_plus_abs_b(a, b):
     return f(a, b)
 
 
+# To-do
 def two_of_three(x, y, z):
     """Return a*a + b*b, where a and b are the two smallest members of the
     positive numbers x, y, and z.
@@ -38,11 +39,8 @@ def two_of_three(x, y, z):
     >>> [type(x).__name__ for x in ast.parse(inspect.getsource(two_of_three)).body[0].body]
     ['Expr', 'Return']
     """
-    return min(x, y, z) ** 2 + [x, y, z].remove(min(x, y, z)).remove(
-        min(
-            x,
-        )
-    )
+    # return sum(x ** 2 for x in sorted([x,y,z])[:2]) 更复杂的一种实现
+    return x**2 + y**2 + z**2 - max(x, y, z) ** 2
 
 
 def largest_factor(n):
@@ -106,8 +104,10 @@ def with_if_function():
     return if_function(cond(), true_func(), false_func())
 
 
+# To-do
 def cond():
     "*** YOUR CODE HERE ***"
+    print("42")
     return True
 
 
@@ -121,6 +121,7 @@ def false_func():
     print("42")
 
 
+# To-do
 def hailstone(n):
     """Print the hailstone sequence starting at n and return its
     length.
@@ -138,14 +139,30 @@ def hailstone(n):
     """
     "*** YOUR CODE HERE ***"
 
-    print(n)
+    def travel(length, n):
+        # print(n)
+        if n == 1:
+            return length
+        if n % 2 == 0:
+            n = int(n / 2)
+        else:
+            n = n * 3 + 1
+        length += 1
+        return travel(length, n)
 
-    if n == 1:
-        return
+    length = 1
+    return travel(length, n)
 
-    if n % 2 == 0:
-        n = int(n / 2)
-        hailstone(n)
-    else:
-        n = n * 3 + 1
-        hailstone(n)
+
+# n is the range
+def find_max_hailstone(n):
+    maximum_length = 1
+    result_number = 0
+    for x in range(1, n):
+        length = hailstone(x)
+        print(length)
+        print(x)
+        if length > maximum_length:
+            maximum_length = length
+            result_number = x
+    print(f"maximum length is {maximum_length}, the number is {result_number}")

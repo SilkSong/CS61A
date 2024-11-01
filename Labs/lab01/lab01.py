@@ -11,6 +11,16 @@ def falling(n, k):
     1
     """
     "*** YOUR CODE HERE ***"
+    if k == 0:
+        return 1
+    else:
+        count = 0
+        result = n
+        n -= 1
+        result = result * n
+        count += 1
+        if count == k:
+            return result
 
 
 def sum_digits(y):
