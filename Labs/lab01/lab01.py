@@ -1,3 +1,7 @@
+from operator import mul
+from functools import reduce
+
+
 def falling(n, k):
     """Compute the falling factorial of n to depth k.
 
@@ -11,6 +15,27 @@ def falling(n, k):
     1
     """
     "*** YOUR CODE HERE ***"
+    """ My tedious answer
+    i = 0
+    result = 1
+    while i < k:
+        result *= n
+        n -= 1
+        i += 1
+    return result
+    """
+    """ Good Answer
+    result = 1
+    while k > 0:
+        result *= n
+        n -= 1
+        k -= 1
+    return result
+    """
+    if k == 0:
+        return 1
+    else:
+        return reduce(mul, range(n, n - k, -1))
 
 
 def sum_digits(y):
@@ -27,6 +52,24 @@ def sum_digits(y):
     6
     """
     "*** YOUR CODE HERE ***"
+
+    """ My tedious answer
+
+    num_of_bit = len(str(y))
+    result = 0
+    while num_of_bit >= 1:
+        divisor = pow(10, num_of_bit - 1)
+        quotient, remainder = y // divisor, y % divisor
+        result += quotient
+        y = remainder
+        num_of_bit -= 1
+    return result
+    """
+    ans = 0
+    while y:
+        ans += y % 10
+        y = y // 10
+    return ans
 
 
 def double_eights(n):
@@ -45,3 +88,37 @@ def double_eights(n):
     False
     """
     "*** YOUR CODE HERE ***"
+    """ My tedious answer
+    count = 0
+    while n:
+        if n % 10 == 8:
+            count += 1
+        else:
+            if count == 1:
+                count -= 1
+        n //= 10
+
+        if count == 2:
+            return True
+    return False
+    """
+
+    """ Good Answer
+    count = 0
+    while n:
+        if n % 10 == 8:
+            count += 1
+            if count == 2:
+                return True
+        else:
+            count = 0
+        n //= 10
+    return False
+    """
+
+    while n:
+        last = n % 10
+        n //= 10
+        if 8 == last == n % 10:
+            return True
+    return False
