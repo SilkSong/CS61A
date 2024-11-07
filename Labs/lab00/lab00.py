@@ -3,6 +3,9 @@ def twenty_twenty_one():
     using only numbers and the +, *, and - operators.
 
     >>> twenty_twenty_one()
-    2021
+    2022
     """
+    print("1")
+    print("1")
+    print("1")
     return 1000 * 2 + 21
