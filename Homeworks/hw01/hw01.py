@@ -54,11 +54,10 @@ def largest_factor(n):
     1
     """
     "*** YOUR CODE HERE ***"
-    result = 1
-    for num in range(1, n):
-        if n % num == 0:
-            result = num
-    return result
+    i = n - 1
+    while n % i != 0:
+        i = i - 1
+    return i
 
 
 def if_function(condition, true_result, false_result):
@@ -107,18 +106,17 @@ def with_if_function():
 # To-do
 def cond():
     "*** YOUR CODE HERE ***"
-    print("42")
-    return True
+    return False
 
 
 def true_func():
     "*** YOUR CODE HERE ***"
-    print("47")
+    print("42")
 
 
 def false_func():
     "*** YOUR CODE HERE ***"
-    print("42")
+    print("47")
 
 
 # To-do
@@ -139,8 +137,9 @@ def hailstone(n):
     """
     "*** YOUR CODE HERE ***"
 
+    """ My Answer
     def travel(length, n):
-        # print(n)
+        print(n)
         if n == 1:
             return length
         if n % 2 == 0:
@@ -152,6 +151,17 @@ def hailstone(n):
 
     length = 1
     return travel(length, n)
+    """
+    i = 1
+    while n != 1:
+        print(n)
+        i = i + 1
+        if n % 2 == 0:
+            n = n // 2
+        else:
+            n = 3 * n + 1
+    print(n)
+    return i
 
 
 # n is the range
