@@ -1,6 +1,6 @@
 test = {
   'name': 'Question 5',
-  'points': 5,
+  'points': 3,
   'suites': [
     {
       'cases': [
@@ -14,7 +14,6 @@ test = {
           ],
           'hidden': False,
           'locked': True,
-          'multiline': False,
           'question': r"""
           The variables score0 and score1 are the scores for Player 0
           and Player 1, respectively. Under what conditions should the
@@ -30,7 +29,6 @@ test = {
           ],
           'hidden': False,
           'locked': True,
-          'multiline': False,
           'question': 'What is a strategy in the context of this game?'
         },
         {
@@ -43,7 +41,6 @@ test = {
           ],
           'hidden': False,
           'locked': True,
-          'multiline': False,
           'question': r"""
           If strategy1 is Player 1's strategy function, score0 is
           Player 0's current score, and score1 is Player 1's current
@@ -59,3139 +56,3446 @@ test = {
       'cases': [
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=69484, score0=15, score1=10, goal=32, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (15, 10).
-          Player 0 rolls 8 dice and gets outcomes [2, 1, 6, 6, 6, 5, 4, 4].
-          End scores = (16, 10)
-          >>> print(turns[1])
-          Start scores = (16, 10).
-          Player 1 rolls 5 dice and gets outcomes [4, 2, 4, 6, 2].
-          End scores = (16, 28)
-          >>> print(turns[2])
-          Start scores = (16, 28).
-          Player 0 rolls 3 dice and gets outcomes [1, 1, 5].
-          End scores = (17, 28)
-          >>> print(turns[3])
-          Start scores = (17, 28).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (17, 41)
-          >>> print(turns[4])
-          Game Over
+          >>> #
+          >>> # Play function stops at goal
+          >>> s0, s1 = hog.play(always(5), always(3), score0=91, score1=10, dice=always_three)
+          >>> s0
+          17a90ac6d84565b47483000c22f1f6de
+          # locked
+          >>> s1
+          70e71b420a966665c548a3bb2cb30d7d
+          # locked
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': True
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=42415, score0=3, score1=3, goal=46, update=hog.simple_update)
+          >>> #
+          >>> # Goal score is not hardwired
+          >>> s0, s1 = hog.play(always(5), always(5), goal=10, dice=always_three)
+          >>> s0
+          af0b3285304485122429774c0ea3182a
+          # locked
+          >>> s1
+          962aea5f59fc55bd65ccacf4603c8f22
+          # locked
+          """,
+          'hidden': False,
+          'locked': True
+        },
+        {
+          'code': r"""
+          >>> #
+          >>> # Extra turn from swine align
+          >>> s0, s1 = hog.play(always(5), always(5), goal=25, dice=always_three)
+          >>> s0
+          15
+          >>> s1
+          30
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> #
+          >>> # Goal score is not hardwired
+          >>> s0, s1 = hog.play(always(5), always(5), goal=15, dice=always_three)
+          >>> s0
+          15
+          >>> s1
+          0
+          """,
+          'hidden': False,
+          'locked': False
+        }
+      ],
+      'scored': True,
+      'setup': r"""
+      >>> import hog
+      >>> always_three = hog.make_test_dice(3)
+      >>> always = hog.always_roll
+      """,
+      'teardown': '',
+      'type': 'doctest'
+    },
+    {
+      'cases': [
+        {
+          'code': r"""
+          >>> #
+          >>> # Use strategies
+          >>> # We recommend working this out turn-by-turn on a piece of paper (use Python for difficult calculations).
+          >>> strat0 = lambda score, opponent: opponent % 10
+          >>> strat1 = lambda score, opponent: max((score // 10) - 4, 0)
+          >>> s0, s1 = hog.play(strat0, strat1, score0=71, score1=80, dice=always_seven)
+          >>> s0
+          03f84ad87569499dc2c6ad5123dd852a
+          # locked
+          >>> s1
+          c8735a01952a81cf365b4c80d8fbb832
+          # locked
+          """,
+          'hidden': False,
+          'locked': True
+        }
+      ],
+      'scored': True,
+      'setup': r"""
+      >>> import hog
+      >>> always_three = hog.make_test_dice(3)
+      >>> always_seven = hog.make_test_dice(7)
+      """,
+      'teardown': '',
+      'type': 'doctest'
+    },
+    {
+      'cases': [
+        {
+          'code': r"""
+          >>> #
+          >>> # Player 0 win
+          >>> s0, s1 = hog.play(always(4), always(4), score0=88, score1=87, dice=always_three)
+          >>> s0
+          100
+          >>> s1
+          87
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> #
+          >>> # Free bacon refers to correct opponent score
+          >>> s0, s1 = hog.play(always(0), always(0), score0=8, score1=95, dice=always_three)
+          >>> s0
+          12
+          >>> s1
+          107
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> #
+          >>> # Handle multiple turns with stacking extra turns
+          >>> s0, s1 = hog.play(always(1), always(1), goal=25, dice=hog.make_test_dice(5, 10, 3, 1, 11, 6))
+          >>> s0
+          26
+          >>> s1
+          10
+          """,
+          'hidden': False,
+          'locked': False
+        }
+      ],
+      'scored': True,
+      'setup': r"""
+      >>> import hog
+      >>> always_one = hog.make_test_dice(1)
+      >>> always_two = hog.make_test_dice(2)
+      >>> always_three = hog.make_test_dice(3)
+      >>> always = hog.always_roll
+      """,
+      'teardown': '',
+      'type': 'doctest'
+    },
+    {
+      'cases': [
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=45891, score0=47, score1=53, goal=54)
           >>> print(turns[0])
-          Start scores = (3, 3).
-          Player 0 rolls 3 dice and gets outcomes [5, 5, 4].
-          End scores = (17, 3)
+          Start scores = (47, 53).
+          Player 0 rolls 9 dice and gets outcomes [5, 1, 1, 2, 6, 1, 1, 1, 5].
+          End scores = (48, 53)
           >>> print(turns[1])
-          Start scores = (17, 3).
-          Player 1 rolls 8 dice and gets outcomes [3, 1, 3, 3, 2, 3, 1, 5].
-          End scores = (17, 4)
+          Start scores = (48, 53).
+          Player 1 rolls 7 dice and gets outcomes [3, 2, 6, 2, 3, 2, 5].
+          End scores = (48, 76)
           >>> print(turns[2])
-          Start scores = (17, 4).
-          Player 0 rolls 6 dice and gets outcomes [1, 6, 4, 5, 2, 5].
-          End scores = (18, 4)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=5192, score0=43, score1=12, goal=47)
+          >>> print(turns[0])
+          Start scores = (43, 12).
+          Player 0 rolls 8 dice and gets outcomes [2, 1, 5, 1, 3, 3, 2, 3].
+          End scores = (44, 12)
+          >>> print(turns[1])
+          Start scores = (44, 12).
+          Player 1 rolls 8 dice and gets outcomes [5, 2, 5, 3, 5, 4, 2, 1].
+          End scores = (44, 13)
+          >>> print(turns[2])
+          Start scores = (44, 13).
+          Player 0 rolls 6 dice and gets outcomes [2, 3, 1, 1, 6, 1].
+          End scores = (45, 13)
           >>> print(turns[3])
-          Start scores = (18, 4).
-          Player 1 rolls 2 dice and gets outcomes [3, 6].
-          End scores = (18, 13)
+          Start scores = (45, 13).
+          Player 1 rolls 3 dice and gets outcomes [4, 6, 5].
+          End scores = (45, 28)
           >>> print(turns[4])
-          Start scores = (18, 13).
-          Player 0 rolls 6 dice and gets outcomes [4, 1, 6, 3, 2, 1].
-          End scores = (19, 13)
+          Start scores = (45, 28).
+          Player 0 rolls 3 dice and gets outcomes [4, 5, 2].
+          End scores = (56, 28)
           >>> print(turns[5])
-          Start scores = (19, 13).
-          Player 1 rolls 8 dice and gets outcomes [6, 2, 2, 1, 3, 4, 1, 3].
-          End scores = (19, 14)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=95816, score0=15, score1=45, goal=50)
+          >>> print(turns[0])
+          Start scores = (15, 45).
+          Player 0 rolls 8 dice and gets outcomes [2, 3, 1, 6, 5, 1, 5, 6].
+          End scores = (16, 45)
+          >>> print(turns[1])
+          Start scores = (16, 45).
+          Player 1 rolls 10 dice and gets outcomes [5, 2, 4, 3, 6, 3, 4, 5, 1, 2].
+          End scores = (16, 46)
+          >>> print(turns[2])
+          Start scores = (16, 46).
+          Player 0 rolls 2 dice and gets outcomes [4, 6].
+          End scores = (26, 46)
+          >>> print(turns[3])
+          Start scores = (26, 46).
+          Player 1 rolls 1 dice and gets outcomes [2].
+          End scores = (26, 48)
+          >>> print(turns[4])
+          Start scores = (26, 48).
+          Player 0 rolls 6 dice and gets outcomes [2, 1, 4, 2, 6, 6].
+          End scores = (27, 48)
+          >>> print(turns[5])
+          Start scores = (27, 48).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (27, 54)
           >>> print(turns[6])
-          Start scores = (19, 14).
-          Player 0 rolls 10 dice and gets outcomes [4, 2, 3, 5, 6, 4, 3, 4, 3, 4].
-          End scores = (57, 14)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=25365, score0=3, score1=8, goal=34)
+          >>> print(turns[0])
+          Start scores = (3, 8).
+          Player 0 rolls 6 dice and gets outcomes [2, 5, 4, 6, 5, 1].
+          End scores = (4, 8)
+          >>> print(turns[1])
+          Start scores = (4, 8).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (4, 16)
+          >>> print(turns[2])
+          Start scores = (4, 16).
+          Player 0 rolls 10 dice and gets outcomes [2, 2, 3, 1, 1, 6, 2, 6, 5, 5].
+          End scores = (5, 16)
+          >>> print(turns[3])
+          Start scores = (5, 16).
+          Player 1 rolls 1 dice and gets outcomes [2].
+          End scores = (5, 18)
+          >>> print(turns[4])
+          Start scores = (5, 18).
+          Player 0 rolls 2 dice and gets outcomes [4, 1].
+          End scores = (6, 18)
+          >>> print(turns[5])
+          Start scores = (6, 18).
+          Player 1 rolls 6 dice and gets outcomes [4, 6, 6, 6, 6, 4].
+          End scores = (6, 50)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=11863, score0=55, score1=5, goal=56)
+          >>> print(turns[0])
+          Start scores = (55, 5).
+          Player 0 rolls 6 dice and gets outcomes [5, 1, 2, 1, 3, 5].
+          End scores = (56, 5)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=59465, score0=61, score1=16, goal=88)
+          >>> print(turns[0])
+          Start scores = (61, 16).
+          Player 0 rolls 4 dice and gets outcomes [2, 2, 3, 4].
+          End scores = (72, 16)
+          >>> print(turns[1])
+          Start scores = (72, 16).
+          Player 1 rolls 2 dice and gets outcomes [2, 3].
+          End scores = (72, 21)
+          >>> print(turns[2])
+          Start scores = (72, 21).
+          Player 0 rolls 9 dice and gets outcomes [2, 6, 3, 6, 2, 1, 5, 1, 3].
+          End scores = (73, 21)
+          >>> print(turns[3])
+          Start scores = (73, 21).
+          Player 1 rolls 6 dice and gets outcomes [2, 2, 2, 2, 2, 1].
+          End scores = (73, 22)
+          >>> print(turns[4])
+          Start scores = (73, 22).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (74, 22)
+          >>> print(turns[5])
+          Start scores = (74, 22).
+          Player 1 rolls 8 dice and gets outcomes [1, 3, 1, 5, 5, 3, 1, 2].
+          End scores = (74, 23)
+          >>> print(turns[6])
+          Start scores = (74, 23).
+          Player 0 rolls 9 dice and gets outcomes [2, 6, 3, 4, 4, 4, 5, 4, 4].
+          End scores = (110, 23)
           >>> print(turns[7])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=15589, score0=14, score1=13, goal=88, update=hog.simple_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=4714, score0=9, score1=3, goal=20)
           >>> print(turns[0])
-          Start scores = (14, 13).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (19, 13)
-          >>> print(turns[1])
-          Start scores = (19, 13).
-          Player 1 rolls 1 dice and gets outcomes [3].
-          End scores = (19, 16)
-          >>> print(turns[2])
-          Start scores = (19, 16).
-          Player 0 rolls 6 dice and gets outcomes [3, 4, 1, 5, 2, 6].
-          End scores = (20, 16)
-          >>> print(turns[3])
-          Start scores = (20, 16).
-          Player 1 rolls 7 dice and gets outcomes [1, 4, 5, 2, 6, 6, 5].
-          End scores = (20, 17)
-          >>> print(turns[4])
-          Start scores = (20, 17).
-          Player 0 rolls 1 dice and gets outcomes [2].
-          End scores = (22, 17)
-          >>> print(turns[5])
-          Start scores = (22, 17).
-          Player 1 rolls 4 dice and gets outcomes [1, 6, 6, 3].
-          End scores = (22, 18)
-          >>> print(turns[6])
-          Start scores = (22, 18).
-          Player 0 rolls 8 dice and gets outcomes [5, 1, 2, 3, 6, 2, 5, 3].
-          End scores = (23, 18)
-          >>> print(turns[7])
-          Start scores = (23, 18).
-          Player 1 rolls 10 dice and gets outcomes [5, 2, 3, 2, 4, 6, 3, 3, 3, 3].
-          End scores = (23, 52)
-          >>> print(turns[8])
-          Start scores = (23, 52).
-          Player 0 rolls 6 dice and gets outcomes [5, 5, 4, 6, 5, 2].
-          End scores = (50, 52)
-          >>> print(turns[9])
-          Start scores = (50, 52).
-          Player 1 rolls 9 dice and gets outcomes [3, 2, 3, 4, 3, 6, 4, 3, 2].
-          End scores = (50, 82)
-          >>> print(turns[10])
-          Start scores = (50, 82).
-          Player 0 rolls 1 dice and gets outcomes [3].
-          End scores = (53, 82)
-          >>> print(turns[11])
-          Start scores = (53, 82).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (53, 87)
-          >>> print(turns[12])
-          Start scores = (53, 87).
-          Player 0 rolls 6 dice and gets outcomes [5, 4, 4, 2, 1, 1].
-          End scores = (54, 87)
-          >>> print(turns[13])
-          Start scores = (54, 87).
-          Player 1 rolls 4 dice and gets outcomes [4, 2, 5, 1].
-          End scores = (54, 88)
-          >>> print(turns[14])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=27754, score0=23, score1=55, goal=56, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (23, 55).
-          Player 0 rolls 4 dice and gets outcomes [5, 2, 6, 1].
-          End scores = (24, 55)
-          >>> print(turns[1])
-          Start scores = (24, 55).
-          Player 1 rolls 7 dice and gets outcomes [2, 3, 1, 3, 6, 4, 4].
-          End scores = (24, 56)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=50266, score0=64, score1=24, goal=88, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (64, 24).
-          Player 0 rolls 9 dice and gets outcomes [5, 5, 1, 4, 6, 6, 2, 4, 1].
-          End scores = (65, 24)
-          >>> print(turns[1])
-          Start scores = (65, 24).
-          Player 1 rolls 8 dice and gets outcomes [5, 6, 5, 4, 1, 5, 1, 1].
-          End scores = (65, 36)
-          >>> print(turns[2])
-          Start scores = (65, 36).
-          Player 0 rolls 9 dice and gets outcomes [4, 3, 2, 6, 5, 5, 3, 6, 6].
-          End scores = (105, 36)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=3995, score0=3, score1=4, goal=10, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (3, 4).
-          Player 0 rolls 4 dice and gets outcomes [5, 4, 5, 3].
-          End scores = (20, 4)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=1033, score0=47, score1=10, goal=49, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (47, 10).
-          Player 0 rolls 5 dice and gets outcomes [4, 6, 3, 5, 1].
-          End scores = (48, 10)
-          >>> print(turns[1])
-          Start scores = (48, 10).
-          Player 1 rolls 7 dice and gets outcomes [3, 3, 5, 5, 2, 1, 2].
-          End scores = (48, 11)
-          >>> print(turns[2])
-          Start scores = (48, 11).
-          Player 0 rolls 10 dice and gets outcomes [5, 6, 5, 3, 6, 5, 2, 3, 2, 2].
-          End scores = (87, 11)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=23897, score0=8, score1=11, goal=44, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (8, 11).
-          Player 0 rolls 9 dice and gets outcomes [4, 1, 4, 4, 3, 3, 2, 2, 3].
-          End scores = (9, 11)
-          >>> print(turns[1])
-          Start scores = (9, 11).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (9, 16)
-          >>> print(turns[2])
-          Start scores = (9, 16).
-          Player 0 rolls 3 dice and gets outcomes [1, 5, 6].
-          End scores = (10, 16)
-          >>> print(turns[3])
-          Start scores = (10, 16).
-          Player 1 rolls 1 dice and gets outcomes [6].
-          End scores = (10, 22)
-          >>> print(turns[4])
-          Start scores = (10, 22).
-          Player 0 rolls 9 dice and gets outcomes [1, 3, 4, 3, 6, 4, 3, 5, 3].
-          End scores = (11, 22)
-          >>> print(turns[5])
-          Start scores = (11, 22).
-          Player 1 rolls 9 dice and gets outcomes [1, 5, 2, 2, 5, 2, 1, 2, 5].
-          End scores = (11, 23)
-          >>> print(turns[6])
-          Start scores = (11, 23).
-          Player 0 rolls 6 dice and gets outcomes [6, 4, 4, 1, 6, 6].
-          End scores = (12, 23)
-          >>> print(turns[7])
-          Start scores = (12, 23).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (12, 26)
-          >>> print(turns[8])
-          Start scores = (12, 26).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (21, 26)
-          >>> print(turns[9])
-          Start scores = (21, 26).
-          Player 1 rolls 8 dice and gets outcomes [2, 2, 4, 6, 6, 3, 4, 2].
-          End scores = (21, 55)
-          >>> print(turns[10])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=17635, score0=7, score1=9, goal=10, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (7, 9).
+          Start scores = (9, 3).
           Player 0 rolls 2 dice and gets outcomes [3, 2].
+          End scores = (14, 3)
+          >>> print(turns[1])
+          Start scores = (14, 3).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (14, 15)
+          >>> print(turns[2])
+          Start scores = (14, 15).
+          Player 0 rolls 2 dice and gets outcomes [2, 6].
+          End scores = (22, 15)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=10742, score0=4, score1=25, goal=57)
+          >>> print(turns[0])
+          Start scores = (4, 25).
+          Player 0 rolls 8 dice and gets outcomes [2, 3, 1, 3, 6, 4, 3, 6].
+          End scores = (5, 25)
+          >>> print(turns[1])
+          Start scores = (5, 25).
+          Player 1 rolls 5 dice and gets outcomes [5, 3, 5, 6, 4].
+          End scores = (5, 48)
+          >>> print(turns[2])
+          Start scores = (5, 48).
+          Player 0 rolls 6 dice and gets outcomes [1, 3, 3, 2, 6, 6].
+          End scores = (6, 48)
+          >>> print(turns[3])
+          Start scores = (6, 48).
+          Player 1 rolls 9 dice and gets outcomes [4, 3, 5, 6, 1, 1, 3, 4, 2].
+          End scores = (6, 49)
+          >>> print(turns[4])
+          Start scores = (6, 49).
+          Player 0 rolls 9 dice and gets outcomes [5, 6, 2, 4, 5, 1, 2, 1, 2].
+          End scores = (7, 49)
+          >>> print(turns[5])
+          Start scores = (7, 49).
+          Player 1 rolls 6 dice and gets outcomes [6, 1, 3, 6, 4, 2].
+          End scores = (7, 50)
+          >>> print(turns[6])
+          Start scores = (7, 50).
+          Player 0 rolls 7 dice and gets outcomes [5, 1, 6, 1, 4, 1, 6].
+          End scores = (8, 50)
+          >>> print(turns[7])
+          Start scores = (8, 50).
+          Player 1 rolls 4 dice and gets outcomes [4, 6, 2, 3].
+          End scores = (8, 65)
+          >>> print(turns[8])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=5480, score0=5, score1=8, goal=77)
+          >>> print(turns[0])
+          Start scores = (5, 8).
+          Player 0 rolls 7 dice and gets outcomes [3, 6, 3, 3, 4, 4, 6].
+          End scores = (34, 8)
+          >>> print(turns[1])
+          Start scores = (34, 8).
+          Player 1 rolls 2 dice and gets outcomes [1, 4].
+          End scores = (34, 9)
+          >>> print(turns[2])
+          Start scores = (34, 9).
+          Player 0 rolls 1 dice and gets outcomes [2].
+          End scores = (36, 9)
+          >>> print(turns[3])
+          Start scores = (36, 9).
+          Player 1 rolls 8 dice and gets outcomes [5, 4, 4, 4, 4, 5, 1, 1].
+          End scores = (36, 10)
+          >>> print(turns[4])
+          Start scores = (36, 10).
+          Player 0 rolls 6 dice and gets outcomes [2, 4, 5, 5, 4, 5].
+          End scores = (61, 10)
+          >>> print(turns[5])
+          Start scores = (61, 10).
+          Player 1 rolls 4 dice and gets outcomes [4, 1, 1, 2].
+          End scores = (61, 11)
+          >>> print(turns[6])
+          Start scores = (61, 11).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (62, 11)
+          >>> print(turns[7])
+          Start scores = (62, 11).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (62, 23)
+          >>> print(turns[8])
+          Start scores = (62, 23).
+          Player 0 rolls 1 dice and gets outcomes [3].
+          End scores = (65, 23)
+          >>> print(turns[9])
+          Start scores = (65, 23).
+          Player 1 rolls 1 dice and gets outcomes [1].
+          End scores = (65, 24)
+          >>> print(turns[10])
+          Start scores = (65, 24).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (71, 24)
+          >>> print(turns[11])
+          Start scores = (71, 24).
+          Player 1 rolls 5 dice and gets outcomes [4, 3, 6, 1, 5].
+          End scores = (71, 25)
+          >>> print(turns[12])
+          Start scores = (71, 25).
+          Player 0 rolls 4 dice and gets outcomes [2, 4, 4, 6].
+          End scores = (87, 25)
+          >>> print(turns[13])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=5014, score0=56, score1=59, goal=64)
+          >>> print(turns[0])
+          Start scores = (56, 59).
+          Player 0 rolls 6 dice and gets outcomes [1, 3, 1, 4, 5, 1].
+          End scores = (57, 59)
+          >>> print(turns[1])
+          Start scores = (57, 59).
+          Player 0 rolls 7 dice and gets outcomes [4, 5, 6, 5, 4, 2, 5].
+          End scores = (88, 59)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=50496, score0=4, score1=15, goal=19)
+          >>> print(turns[0])
+          Start scores = (4, 15).
+          Player 0 rolls 9 dice and gets outcomes [6, 4, 2, 6, 1, 5, 5, 2, 6].
+          End scores = (5, 15)
+          >>> print(turns[1])
+          Start scores = (5, 15).
+          Player 1 rolls 9 dice and gets outcomes [3, 1, 1, 4, 5, 1, 1, 6, 4].
+          End scores = (5, 16)
+          >>> print(turns[2])
+          Start scores = (5, 16).
+          Player 0 rolls 2 dice and gets outcomes [1, 6].
+          End scores = (6, 16)
+          >>> print(turns[3])
+          Start scores = (6, 16).
+          Player 1 rolls 9 dice and gets outcomes [6, 4, 1, 2, 5, 6, 1, 5, 6].
+          End scores = (6, 17)
+          >>> print(turns[4])
+          Start scores = (6, 17).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (7, 17)
+          >>> print(turns[5])
+          Start scores = (7, 17).
+          Player 1 rolls 2 dice and gets outcomes [5, 5].
+          End scores = (7, 27)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=97617, score0=16, score1=27, goal=35)
+          >>> print(turns[0])
+          Start scores = (16, 27).
+          Player 0 rolls 6 dice and gets outcomes [4, 3, 5, 1, 5, 2].
+          End scores = (17, 27)
+          >>> print(turns[1])
+          Start scores = (17, 27).
+          Player 1 rolls 2 dice and gets outcomes [6, 2].
+          End scores = (17, 35)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=19709, score0=27, score1=6, goal=85)
+          >>> print(turns[0])
+          Start scores = (27, 6).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (32, 6)
+          >>> print(turns[1])
+          Start scores = (32, 6).
+          Player 1 rolls 1 dice and gets outcomes [4].
+          End scores = (32, 10)
+          >>> print(turns[2])
+          Start scores = (32, 10).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (40, 10)
+          >>> print(turns[3])
+          Start scores = (40, 10).
+          Player 0 rolls 10 dice and gets outcomes [4, 4, 1, 3, 6, 2, 4, 4, 6, 3].
+          End scores = (41, 10)
+          >>> print(turns[4])
+          Start scores = (41, 10).
+          Player 1 rolls 4 dice and gets outcomes [1, 6, 2, 3].
+          End scores = (41, 11)
+          >>> print(turns[5])
+          Start scores = (41, 11).
+          Player 0 rolls 10 dice and gets outcomes [4, 2, 4, 5, 6, 1, 1, 3, 4, 5].
+          End scores = (42, 11)
+          >>> print(turns[6])
+          Start scores = (42, 11).
+          Player 1 rolls 2 dice and gets outcomes [2, 2].
+          End scores = (42, 15)
+          >>> print(turns[7])
+          Start scores = (42, 15).
+          Player 0 rolls 9 dice and gets outcomes [2, 2, 2, 4, 2, 1, 2, 5, 3].
+          End scores = (43, 15)
+          >>> print(turns[8])
+          Start scores = (43, 15).
+          Player 1 rolls 8 dice and gets outcomes [4, 2, 4, 5, 4, 6, 4, 1].
+          End scores = (43, 16)
+          >>> print(turns[9])
+          Start scores = (43, 16).
+          Player 0 rolls 7 dice and gets outcomes [6, 2, 5, 2, 5, 1, 6].
+          End scores = (44, 16)
+          >>> print(turns[10])
+          Start scores = (44, 16).
+          Player 1 rolls 5 dice and gets outcomes [1, 1, 4, 1, 4].
+          End scores = (44, 17)
+          >>> print(turns[11])
+          Start scores = (44, 17).
+          Player 0 rolls 8 dice and gets outcomes [3, 2, 6, 2, 3, 6, 4, 4].
+          End scores = (74, 17)
+          >>> print(turns[12])
+          Start scores = (74, 17).
+          Player 1 rolls 10 dice and gets outcomes [6, 2, 5, 5, 4, 2, 3, 4, 2, 3].
+          End scores = (74, 53)
+          >>> print(turns[13])
+          Start scores = (74, 53).
+          Player 0 rolls 2 dice and gets outcomes [4, 6].
+          End scores = (84, 53)
+          >>> print(turns[14])
+          Start scores = (84, 53).
+          Player 1 rolls 5 dice and gets outcomes [3, 5, 4, 2, 4].
+          End scores = (84, 71)
+          >>> print(turns[15])
+          Start scores = (84, 71).
+          Player 0 rolls 7 dice and gets outcomes [2, 6, 6, 1, 4, 5, 1].
+          End scores = (85, 71)
+          >>> print(turns[16])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=33634, score0=48, score1=74, goal=92)
+          >>> print(turns[0])
+          Start scores = (48, 74).
+          Player 0 rolls 8 dice and gets outcomes [3, 5, 1, 3, 3, 4, 3, 1].
+          End scores = (49, 74)
+          >>> print(turns[1])
+          Start scores = (49, 74).
+          Player 1 rolls 8 dice and gets outcomes [3, 6, 3, 3, 4, 6, 6, 2].
+          End scores = (49, 107)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=22855, score0=12, score1=22, goal=98)
+          >>> print(turns[0])
+          Start scores = (12, 22).
+          Player 0 rolls 8 dice and gets outcomes [3, 6, 5, 3, 3, 2, 5, 3].
+          End scores = (42, 22)
+          >>> print(turns[1])
+          Start scores = (42, 22).
+          Player 1 rolls 6 dice and gets outcomes [3, 5, 2, 6, 4, 6].
+          End scores = (42, 48)
+          >>> print(turns[2])
+          Start scores = (42, 48).
+          Player 0 rolls 4 dice and gets outcomes [2, 3, 1, 4].
+          End scores = (43, 48)
+          >>> print(turns[3])
+          Start scores = (43, 48).
+          Player 1 rolls 8 dice and gets outcomes [4, 1, 4, 5, 5, 3, 1, 2].
+          End scores = (43, 49)
+          >>> print(turns[4])
+          Start scores = (43, 49).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (47, 49)
+          >>> print(turns[5])
+          Start scores = (47, 49).
+          Player 0 rolls 7 dice and gets outcomes [6, 6, 2, 3, 3, 4, 1].
+          End scores = (48, 49)
+          >>> print(turns[6])
+          Start scores = (48, 49).
+          Player 0 rolls 4 dice and gets outcomes [3, 1, 2, 2].
+          End scores = (49, 49)
+          >>> print(turns[7])
+          Start scores = (49, 49).
+          Player 0 rolls 4 dice and gets outcomes [5, 3, 2, 4].
+          End scores = (63, 49)
+          >>> print(turns[8])
+          Start scores = (63, 49).
+          Player 1 rolls 8 dice and gets outcomes [5, 4, 6, 6, 3, 5, 4, 3].
+          End scores = (63, 85)
+          >>> print(turns[9])
+          Start scores = (63, 85).
+          Player 0 rolls 3 dice and gets outcomes [1, 5, 2].
+          End scores = (64, 85)
+          >>> print(turns[10])
+          Start scores = (64, 85).
+          Player 1 rolls 8 dice and gets outcomes [2, 6, 4, 2, 6, 5, 6, 4].
+          End scores = (64, 120)
+          >>> print(turns[11])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=49015, score0=12, score1=5, goal=82)
+          >>> print(turns[0])
+          Start scores = (12, 5).
+          Player 0 rolls 8 dice and gets outcomes [1, 3, 2, 1, 5, 1, 4, 1].
+          End scores = (13, 5)
+          >>> print(turns[1])
+          Start scores = (13, 5).
+          Player 1 rolls 10 dice and gets outcomes [1, 6, 2, 5, 5, 6, 5, 4, 1, 2].
+          End scores = (13, 6)
+          >>> print(turns[2])
+          Start scores = (13, 6).
+          Player 0 rolls 6 dice and gets outcomes [2, 4, 2, 4, 2, 5].
+          End scores = (32, 6)
+          >>> print(turns[3])
+          Start scores = (32, 6).
+          Player 1 rolls 4 dice and gets outcomes [3, 5, 6, 6].
+          End scores = (32, 26)
+          >>> print(turns[4])
+          Start scores = (32, 26).
+          Player 0 rolls 7 dice and gets outcomes [3, 5, 4, 5, 3, 2, 1].
+          End scores = (33, 26)
+          >>> print(turns[5])
+          Start scores = (33, 26).
+          Player 1 rolls 5 dice and gets outcomes [6, 3, 1, 4, 1].
+          End scores = (33, 27)
+          >>> print(turns[6])
+          Start scores = (33, 27).
+          Player 0 rolls 6 dice and gets outcomes [6, 4, 6, 2, 2, 4].
+          End scores = (57, 27)
+          >>> print(turns[7])
+          Start scores = (57, 27).
+          Player 1 rolls 5 dice and gets outcomes [6, 3, 4, 6, 2].
+          End scores = (57, 48)
+          >>> print(turns[8])
+          Start scores = (57, 48).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (65, 48)
+          >>> print(turns[9])
+          Start scores = (65, 48).
+          Player 1 rolls 6 dice and gets outcomes [6, 2, 5, 4, 4, 3].
+          End scores = (65, 72)
+          >>> print(turns[10])
+          Start scores = (65, 72).
+          Player 0 rolls 3 dice and gets outcomes [3, 3, 5].
+          End scores = (76, 72)
+          >>> print(turns[11])
+          Start scores = (76, 72).
+          Player 1 rolls 3 dice and gets outcomes [5, 3, 6].
+          End scores = (76, 86)
+          >>> print(turns[12])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=50497, score0=46, score1=5, goal=51)
+          >>> print(turns[0])
+          Start scores = (46, 5).
+          Player 0 rolls 6 dice and gets outcomes [3, 3, 1, 2, 5, 2].
+          End scores = (47, 5)
+          >>> print(turns[1])
+          Start scores = (47, 5).
+          Player 1 rolls 3 dice and gets outcomes [4, 5, 6].
+          End scores = (47, 20)
+          >>> print(turns[2])
+          Start scores = (47, 20).
+          Player 0 rolls 8 dice and gets outcomes [6, 2, 3, 3, 3, 4, 2, 6].
+          End scores = (76, 20)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=42297, score0=6, score1=22, goal=25)
+          >>> print(turns[0])
+          Start scores = (6, 22).
+          Player 0 rolls 2 dice and gets outcomes [6, 1].
+          End scores = (7, 22)
+          >>> print(turns[1])
+          Start scores = (7, 22).
+          Player 1 rolls 8 dice and gets outcomes [1, 2, 5, 1, 2, 2, 3, 4].
+          End scores = (7, 23)
+          >>> print(turns[2])
+          Start scores = (7, 23).
+          Player 0 rolls 10 dice and gets outcomes [3, 6, 4, 2, 1, 5, 2, 1, 2, 1].
+          End scores = (8, 23)
+          >>> print(turns[3])
+          Start scores = (8, 23).
+          Player 1 rolls 10 dice and gets outcomes [1, 1, 2, 5, 6, 5, 6, 4, 6, 4].
+          End scores = (8, 24)
+          >>> print(turns[4])
+          Start scores = (8, 24).
+          Player 0 rolls 8 dice and gets outcomes [3, 1, 6, 2, 5, 4, 1, 2].
+          End scores = (9, 24)
+          >>> print(turns[5])
+          Start scores = (9, 24).
+          Player 1 rolls 4 dice and gets outcomes [1, 1, 4, 3].
+          End scores = (9, 25)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=1726, score0=19, score1=5, goal=52)
+          >>> print(turns[0])
+          Start scores = (19, 5).
+          Player 0 rolls 10 dice and gets outcomes [5, 1, 3, 4, 3, 1, 5, 1, 5, 3].
+          End scores = (20, 5)
+          >>> print(turns[1])
+          Start scores = (20, 5).
+          Player 1 rolls 1 dice and gets outcomes [2].
+          End scores = (20, 7)
+          >>> print(turns[2])
+          Start scores = (20, 7).
+          Player 0 rolls 10 dice and gets outcomes [2, 3, 3, 5, 6, 2, 6, 4, 6, 6].
+          End scores = (63, 7)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=17218, score0=19, score1=10, goal=50)
+          >>> print(turns[0])
+          Start scores = (19, 10).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (27, 10)
+          >>> print(turns[1])
+          Start scores = (27, 10).
+          Player 1 rolls 10 dice and gets outcomes [3, 1, 5, 2, 3, 3, 5, 1, 1, 4].
+          End scores = (27, 11)
+          >>> print(turns[2])
+          Start scores = (27, 11).
+          Player 0 rolls 1 dice and gets outcomes [6].
+          End scores = (33, 11)
+          >>> print(turns[3])
+          Start scores = (33, 11).
+          Player 0 rolls 10 dice and gets outcomes [3, 2, 6, 2, 2, 5, 3, 2, 5, 3].
+          End scores = (66, 11)
+          >>> print(turns[4])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=88988, score0=15, score1=95, goal=100)
+          >>> print(turns[0])
+          Start scores = (15, 95).
+          Player 0 rolls 9 dice and gets outcomes [5, 3, 2, 4, 2, 1, 3, 2, 5].
+          End scores = (16, 95)
+          >>> print(turns[1])
+          Start scores = (16, 95).
+          Player 1 rolls 10 dice and gets outcomes [6, 4, 3, 2, 6, 4, 6, 1, 2, 1].
+          End scores = (16, 96)
+          >>> print(turns[2])
+          Start scores = (16, 96).
+          Player 1 rolls 9 dice and gets outcomes [6, 5, 1, 3, 1, 5, 6, 2, 4].
+          End scores = (16, 97)
+          >>> print(turns[3])
+          Start scores = (16, 97).
+          Player 0 rolls 3 dice and gets outcomes [2, 2, 3].
+          End scores = (23, 97)
+          >>> print(turns[4])
+          Start scores = (23, 97).
+          Player 1 rolls 4 dice and gets outcomes [6, 1, 4, 4].
+          End scores = (23, 98)
+          >>> print(turns[5])
+          Start scores = (23, 98).
+          Player 0 rolls 4 dice and gets outcomes [1, 2, 3, 1].
+          End scores = (24, 98)
+          >>> print(turns[6])
+          Start scores = (24, 98).
+          Player 1 rolls 7 dice and gets outcomes [4, 5, 6, 1, 1, 1, 6].
+          End scores = (24, 99)
+          >>> print(turns[7])
+          Start scores = (24, 99).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (34, 99)
+          >>> print(turns[8])
+          Start scores = (34, 99).
+          Player 1 rolls 6 dice and gets outcomes [1, 5, 6, 1, 3, 2].
+          End scores = (34, 100)
+          >>> print(turns[9])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=8964, score0=79, score1=56, goal=83)
+          >>> print(turns[0])
+          Start scores = (79, 56).
+          Player 0 rolls 7 dice and gets outcomes [5, 2, 3, 6, 6, 1, 6].
+          End scores = (80, 56)
+          >>> print(turns[1])
+          Start scores = (80, 56).
+          Player 1 rolls 4 dice and gets outcomes [1, 2, 5, 1].
+          End scores = (80, 57)
+          >>> print(turns[2])
+          Start scores = (80, 57).
+          Player 0 rolls 9 dice and gets outcomes [2, 5, 6, 3, 5, 6, 6, 1, 4].
+          End scores = (81, 57)
+          >>> print(turns[3])
+          Start scores = (81, 57).
+          Player 1 rolls 8 dice and gets outcomes [6, 3, 3, 3, 3, 2, 6, 3].
+          End scores = (81, 86)
+          >>> print(turns[4])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=24932, score0=12, score1=0, goal=14)
+          >>> print(turns[0])
+          Start scores = (12, 0).
+          Player 0 rolls 6 dice and gets outcomes [1, 1, 1, 3, 3, 2].
+          End scores = (13, 0)
+          >>> print(turns[1])
+          Start scores = (13, 0).
+          Player 1 rolls 8 dice and gets outcomes [4, 1, 5, 4, 3, 3, 5, 1].
+          End scores = (13, 1)
+          >>> print(turns[2])
+          Start scores = (13, 1).
+          Player 0 rolls 4 dice and gets outcomes [5, 3, 2, 3].
+          End scores = (26, 1)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=76726, score0=40, score1=73, goal=93)
+          >>> print(turns[0])
+          Start scores = (40, 73).
+          Player 0 rolls 5 dice and gets outcomes [6, 6, 1, 2, 5].
+          End scores = (41, 73)
+          >>> print(turns[1])
+          Start scores = (41, 73).
+          Player 1 rolls 3 dice and gets outcomes [6, 1, 4].
+          End scores = (41, 74)
+          >>> print(turns[2])
+          Start scores = (41, 74).
+          Player 0 rolls 8 dice and gets outcomes [2, 1, 6, 1, 6, 4, 2, 5].
+          End scores = (42, 74)
+          >>> print(turns[3])
+          Start scores = (42, 74).
+          Player 1 rolls 10 dice and gets outcomes [4, 1, 6, 2, 5, 5, 3, 6, 1, 2].
+          End scores = (42, 75)
+          >>> print(turns[4])
+          Start scores = (42, 75).
+          Player 0 rolls 9 dice and gets outcomes [2, 5, 2, 4, 5, 6, 2, 5, 4].
+          End scores = (77, 75)
+          >>> print(turns[5])
+          Start scores = (77, 75).
+          Player 1 rolls 4 dice and gets outcomes [2, 3, 3, 6].
+          End scores = (77, 89)
+          >>> print(turns[6])
+          Start scores = (77, 89).
+          Player 0 rolls 8 dice and gets outcomes [3, 1, 2, 3, 3, 3, 1, 5].
+          End scores = (78, 89)
+          >>> print(turns[7])
+          Start scores = (78, 89).
+          Player 1 rolls 10 dice and gets outcomes [1, 1, 1, 5, 1, 4, 1, 2, 5, 3].
+          End scores = (78, 90)
+          >>> print(turns[8])
+          Start scores = (78, 90).
+          Player 0 rolls 3 dice and gets outcomes [1, 3, 4].
+          End scores = (79, 90)
+          >>> print(turns[9])
+          Start scores = (79, 90).
+          Player 1 rolls 5 dice and gets outcomes [4, 6, 1, 5, 6].
+          End scores = (79, 91)
+          >>> print(turns[10])
+          Start scores = (79, 91).
+          Player 0 rolls 10 dice and gets outcomes [3, 3, 2, 3, 3, 1, 5, 4, 1, 6].
+          End scores = (80, 91)
+          >>> print(turns[11])
+          Start scores = (80, 91).
+          Player 1 rolls 1 dice and gets outcomes [1].
+          End scores = (80, 92)
+          >>> print(turns[12])
+          Start scores = (80, 92).
+          Player 0 rolls 6 dice and gets outcomes [4, 2, 2, 6, 2, 2].
+          End scores = (98, 92)
+          >>> print(turns[13])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=85393, score0=3, score1=0, goal=44)
+          >>> print(turns[0])
+          Start scores = (3, 0).
+          Player 0 rolls 3 dice and gets outcomes [3, 2, 5].
+          End scores = (13, 0)
+          >>> print(turns[1])
+          Start scores = (13, 0).
+          Player 1 rolls 6 dice and gets outcomes [1, 6, 3, 2, 6, 5].
+          End scores = (13, 1)
+          >>> print(turns[2])
+          Start scores = (13, 1).
+          Player 0 rolls 1 dice and gets outcomes [3].
+          End scores = (16, 1)
+          >>> print(turns[3])
+          Start scores = (16, 1).
+          Player 1 rolls 10 dice and gets outcomes [4, 2, 4, 6, 3, 2, 1, 1, 2, 3].
+          End scores = (16, 2)
+          >>> print(turns[4])
+          Start scores = (16, 2).
+          Player 0 rolls 2 dice and gets outcomes [4, 3].
+          End scores = (23, 2)
+          >>> print(turns[5])
+          Start scores = (23, 2).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (23, 9)
+          >>> print(turns[6])
+          Start scores = (23, 9).
+          Player 0 rolls 9 dice and gets outcomes [2, 5, 1, 6, 1, 1, 1, 1, 6].
+          End scores = (24, 9)
+          >>> print(turns[7])
+          Start scores = (24, 9).
+          Player 1 rolls 2 dice and gets outcomes [4, 4].
+          End scores = (24, 17)
+          >>> print(turns[8])
+          Start scores = (24, 17).
+          Player 0 rolls 9 dice and gets outcomes [3, 4, 4, 1, 6, 2, 3, 5, 1].
+          End scores = (25, 17)
+          >>> print(turns[9])
+          Start scores = (25, 17).
+          Player 1 rolls 3 dice and gets outcomes [1, 4, 6].
+          End scores = (25, 18)
+          >>> print(turns[10])
+          Start scores = (25, 18).
+          Player 0 rolls 9 dice and gets outcomes [1, 3, 4, 6, 5, 3, 1, 1, 2].
+          End scores = (26, 18)
+          >>> print(turns[11])
+          Start scores = (26, 18).
+          Player 1 rolls 6 dice and gets outcomes [6, 3, 2, 4, 1, 5].
+          End scores = (26, 19)
+          >>> print(turns[12])
+          Start scores = (26, 19).
+          Player 0 rolls 2 dice and gets outcomes [4, 2].
+          End scores = (32, 19)
+          >>> print(turns[13])
+          Start scores = (32, 19).
+          Player 1 rolls 2 dice and gets outcomes [1, 1].
+          End scores = (32, 20)
+          >>> print(turns[14])
+          Start scores = (32, 20).
+          Player 0 rolls 3 dice and gets outcomes [1, 4, 6].
+          End scores = (33, 20)
+          >>> print(turns[15])
+          Start scores = (33, 20).
+          Player 1 rolls 5 dice and gets outcomes [2, 5, 6, 4, 6].
+          End scores = (33, 43)
+          >>> print(turns[16])
+          Start scores = (33, 43).
+          Player 0 rolls 8 dice and gets outcomes [2, 6, 6, 3, 1, 3, 3, 6].
+          End scores = (34, 43)
+          >>> print(turns[17])
+          Start scores = (34, 43).
+          Player 1 rolls 6 dice and gets outcomes [2, 6, 2, 3, 3, 5].
+          End scores = (34, 64)
+          >>> print(turns[18])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=35702, score0=10, score1=13, goal=14)
+          >>> print(turns[0])
+          Start scores = (10, 13).
+          Player 0 rolls 4 dice and gets outcomes [5, 4, 6, 2].
+          End scores = (27, 13)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=75713, score0=62, score1=6, goal=63)
+          >>> print(turns[0])
+          Start scores = (62, 6).
+          Player 0 rolls 7 dice and gets outcomes [1, 6, 2, 6, 4, 4, 6].
+          End scores = (63, 6)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=14879, score0=24, score1=8, goal=29)
+          >>> print(turns[0])
+          Start scores = (24, 8).
+          Player 0 rolls 4 dice and gets outcomes [1, 1, 6, 6].
+          End scores = (25, 8)
+          >>> print(turns[1])
+          Start scores = (25, 8).
+          Player 1 rolls 8 dice and gets outcomes [2, 6, 5, 1, 4, 6, 3, 4].
+          End scores = (25, 9)
+          >>> print(turns[2])
+          Start scores = (25, 9).
+          Player 0 rolls 3 dice and gets outcomes [6, 3, 3].
+          End scores = (37, 9)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=62742, score0=9, score1=5, goal=11)
+          >>> print(turns[0])
+          Start scores = (9, 5).
+          Player 0 rolls 3 dice and gets outcomes [3, 2, 4].
+          End scores = (18, 5)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=99168, score0=34, score1=40, goal=95)
+          >>> print(turns[0])
+          Start scores = (34, 40).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (35, 40)
+          >>> print(turns[1])
+          Start scores = (35, 40).
+          Player 1 rolls 3 dice and gets outcomes [5, 2, 5].
+          End scores = (35, 52)
+          >>> print(turns[2])
+          Start scores = (35, 52).
+          Player 0 rolls 9 dice and gets outcomes [1, 5, 5, 2, 6, 4, 4, 3, 1].
+          End scores = (36, 52)
+          >>> print(turns[3])
+          Start scores = (36, 52).
+          Player 1 rolls 5 dice and gets outcomes [4, 1, 5, 4, 4].
+          End scores = (36, 53)
+          >>> print(turns[4])
+          Start scores = (36, 53).
+          Player 0 rolls 1 dice and gets outcomes [6].
+          End scores = (42, 53)
+          >>> print(turns[5])
+          Start scores = (42, 53).
+          Player 1 rolls 10 dice and gets outcomes [1, 3, 5, 5, 2, 1, 5, 1, 2, 2].
+          End scores = (42, 54)
+          >>> print(turns[6])
+          Start scores = (42, 54).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (45, 54)
+          >>> print(turns[7])
+          Start scores = (45, 54).
+          Player 1 rolls 10 dice and gets outcomes [4, 5, 2, 1, 5, 2, 6, 1, 6, 1].
+          End scores = (45, 55)
+          >>> print(turns[8])
+          Start scores = (45, 55).
+          Player 0 rolls 5 dice and gets outcomes [1, 5, 1, 1, 5].
+          End scores = (46, 55)
+          >>> print(turns[9])
+          Start scores = (46, 55).
+          Player 1 rolls 1 dice and gets outcomes [3].
+          End scores = (46, 58)
+          >>> print(turns[10])
+          Start scores = (46, 58).
+          Player 0 rolls 10 dice and gets outcomes [6, 3, 6, 1, 3, 2, 2, 3, 2, 4].
+          End scores = (47, 58)
+          >>> print(turns[11])
+          Start scores = (47, 58).
+          Player 1 rolls 6 dice and gets outcomes [6, 2, 4, 1, 3, 2].
+          End scores = (47, 59)
+          >>> print(turns[12])
+          Start scores = (47, 59).
+          Player 0 rolls 6 dice and gets outcomes [3, 3, 3, 5, 2, 3].
+          End scores = (66, 59)
+          >>> print(turns[13])
+          Start scores = (66, 59).
+          Player 1 rolls 7 dice and gets outcomes [1, 3, 1, 1, 1, 6, 5].
+          End scores = (66, 60)
+          >>> print(turns[14])
+          Start scores = (66, 60).
+          Player 0 rolls 6 dice and gets outcomes [3, 2, 1, 1, 1, 2].
+          End scores = (67, 60)
+          >>> print(turns[15])
+          Start scores = (67, 60).
+          Player 1 rolls 1 dice and gets outcomes [4].
+          End scores = (67, 64)
+          >>> print(turns[16])
+          Start scores = (67, 64).
+          Player 0 rolls 3 dice and gets outcomes [1, 5, 1].
+          End scores = (68, 64)
+          >>> print(turns[17])
+          Start scores = (68, 64).
+          Player 1 rolls 6 dice and gets outcomes [6, 1, 5, 6, 5, 2].
+          End scores = (68, 65)
+          >>> print(turns[18])
+          Start scores = (68, 65).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (71, 65)
+          >>> print(turns[19])
+          Start scores = (71, 65).
+          Player 1 rolls 2 dice and gets outcomes [2, 4].
+          End scores = (71, 71)
+          >>> print(turns[20])
+          Start scores = (71, 71).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (71, 74)
+          >>> print(turns[21])
+          Start scores = (71, 74).
+          Player 0 rolls 7 dice and gets outcomes [3, 6, 5, 1, 5, 6, 5].
+          End scores = (72, 74)
+          >>> print(turns[22])
+          Start scores = (72, 74).
+          Player 0 rolls 7 dice and gets outcomes [1, 2, 5, 2, 3, 6, 4].
+          End scores = (73, 74)
+          >>> print(turns[23])
+          Start scores = (73, 74).
+          Player 0 rolls 6 dice and gets outcomes [4, 5, 3, 5, 2, 4].
+          End scores = (96, 74)
+          >>> print(turns[24])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=98804, score0=37, score1=45, goal=47)
+          >>> print(turns[0])
+          Start scores = (37, 45).
+          Player 0 rolls 4 dice and gets outcomes [1, 3, 3, 2].
+          End scores = (38, 45)
+          >>> print(turns[1])
+          Start scores = (38, 45).
+          Player 1 rolls 8 dice and gets outcomes [6, 5, 5, 3, 5, 5, 4, 3].
+          End scores = (38, 81)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=27518, score0=87, score1=16, goal=92)
+          >>> print(turns[0])
+          Start scores = (87, 16).
+          Player 0 rolls 7 dice and gets outcomes [6, 1, 6, 6, 1, 5, 2].
+          End scores = (88, 16)
+          >>> print(turns[1])
+          Start scores = (88, 16).
+          Player 1 rolls 2 dice and gets outcomes [6, 1].
+          End scores = (88, 17)
+          >>> print(turns[2])
+          Start scores = (88, 17).
+          Player 0 rolls 10 dice and gets outcomes [6, 5, 4, 2, 4, 5, 5, 4, 2, 1].
+          End scores = (89, 17)
+          >>> print(turns[3])
+          Start scores = (89, 17).
+          Player 1 rolls 10 dice and gets outcomes [1, 1, 6, 2, 2, 2, 2, 3, 2, 2].
+          End scores = (89, 18)
+          >>> print(turns[4])
+          Start scores = (89, 18).
+          Player 0 rolls 4 dice and gets outcomes [6, 5, 1, 2].
+          End scores = (90, 18)
+          >>> print(turns[5])
+          Start scores = (90, 18).
+          Player 0 rolls 2 dice and gets outcomes [5, 1].
+          End scores = (91, 18)
+          >>> print(turns[6])
+          Start scores = (91, 18).
+          Player 1 rolls 7 dice and gets outcomes [2, 2, 1, 3, 1, 3, 5].
+          End scores = (91, 19)
+          >>> print(turns[7])
+          Start scores = (91, 19).
+          Player 0 rolls 4 dice and gets outcomes [4, 2, 6, 1].
+          End scores = (92, 19)
+          >>> print(turns[8])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=75062, score0=43, score1=5, goal=97)
+          >>> print(turns[0])
+          Start scores = (43, 5).
+          Player 0 rolls 8 dice and gets outcomes [6, 1, 4, 5, 6, 6, 5, 3].
+          End scores = (44, 5)
+          >>> print(turns[1])
+          Start scores = (44, 5).
+          Player 1 rolls 4 dice and gets outcomes [5, 5, 2, 4].
+          End scores = (44, 21)
+          >>> print(turns[2])
+          Start scores = (44, 21).
+          Player 0 rolls 3 dice and gets outcomes [6, 2, 1].
+          End scores = (45, 21)
+          >>> print(turns[3])
+          Start scores = (45, 21).
+          Player 1 rolls 9 dice and gets outcomes [1, 5, 3, 3, 4, 5, 5, 4, 6].
+          End scores = (45, 22)
+          >>> print(turns[4])
+          Start scores = (45, 22).
+          Player 0 rolls 6 dice and gets outcomes [1, 6, 6, 6, 5, 3].
+          End scores = (46, 22)
+          >>> print(turns[5])
+          Start scores = (46, 22).
+          Player 1 rolls 3 dice and gets outcomes [2, 5, 2].
+          End scores = (46, 31)
+          >>> print(turns[6])
+          Start scores = (46, 31).
+          Player 0 rolls 6 dice and gets outcomes [5, 3, 2, 6, 1, 1].
+          End scores = (47, 31)
+          >>> print(turns[7])
+          Start scores = (47, 31).
+          Player 1 rolls 9 dice and gets outcomes [5, 1, 4, 6, 5, 5, 1, 1, 4].
+          End scores = (47, 32)
+          >>> print(turns[8])
+          Start scores = (47, 32).
+          Player 0 rolls 9 dice and gets outcomes [1, 2, 5, 6, 6, 3, 6, 2, 2].
+          End scores = (48, 32)
+          >>> print(turns[9])
+          Start scores = (48, 32).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (51, 32)
+          >>> print(turns[10])
+          Start scores = (51, 32).
+          Player 1 rolls 4 dice and gets outcomes [5, 1, 4, 5].
+          End scores = (51, 33)
+          >>> print(turns[11])
+          Start scores = (51, 33).
+          Player 0 rolls 9 dice and gets outcomes [4, 5, 5, 2, 1, 6, 5, 1, 4].
+          End scores = (52, 33)
+          >>> print(turns[12])
+          Start scores = (52, 33).
+          Player 1 rolls 3 dice and gets outcomes [2, 4, 5].
+          End scores = (52, 44)
+          >>> print(turns[13])
+          Start scores = (52, 44).
+          Player 0 rolls 8 dice and gets outcomes [6, 2, 2, 5, 3, 6, 5, 1].
+          End scores = (53, 44)
+          >>> print(turns[14])
+          Start scores = (53, 44).
+          Player 1 rolls 10 dice and gets outcomes [3, 1, 3, 2, 3, 6, 1, 6, 3, 1].
+          End scores = (53, 45)
+          >>> print(turns[15])
+          Start scores = (53, 45).
+          Player 0 rolls 5 dice and gets outcomes [2, 3, 1, 1, 5].
+          End scores = (54, 45)
+          >>> print(turns[16])
+          Start scores = (54, 45).
+          Player 1 rolls 7 dice and gets outcomes [2, 3, 5, 5, 5, 2, 3].
+          End scores = (54, 70)
+          >>> print(turns[17])
+          Start scores = (54, 70).
+          Player 0 rolls 6 dice and gets outcomes [4, 4, 3, 3, 4, 5].
+          End scores = (77, 70)
+          >>> print(turns[18])
+          Start scores = (77, 70).
+          Player 1 rolls 9 dice and gets outcomes [3, 1, 3, 5, 5, 2, 5, 5, 4].
+          End scores = (77, 71)
+          >>> print(turns[19])
+          Start scores = (77, 71).
+          Player 0 rolls 1 dice and gets outcomes [6].
+          End scores = (83, 71)
+          >>> print(turns[20])
+          Start scores = (83, 71).
+          Player 1 rolls 5 dice and gets outcomes [4, 6, 3, 1, 6].
+          End scores = (83, 72)
+          >>> print(turns[21])
+          Start scores = (83, 72).
+          Player 0 rolls 9 dice and gets outcomes [1, 4, 3, 1, 5, 3, 3, 6, 4].
+          End scores = (84, 72)
+          >>> print(turns[22])
+          Start scores = (84, 72).
+          Player 0 rolls 7 dice and gets outcomes [3, 2, 2, 3, 3, 1, 6].
+          End scores = (85, 72)
+          >>> print(turns[23])
+          Start scores = (85, 72).
+          Player 1 rolls 10 dice and gets outcomes [5, 4, 5, 5, 3, 5, 1, 2, 4, 3].
+          End scores = (85, 73)
+          >>> print(turns[24])
+          Start scores = (85, 73).
+          Player 0 rolls 9 dice and gets outcomes [3, 4, 5, 3, 6, 3, 6, 4, 6].
+          End scores = (125, 73)
+          >>> print(turns[25])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=578, score0=7, score1=24, goal=30)
+          >>> print(turns[0])
+          Start scores = (7, 24).
+          Player 0 rolls 10 dice and gets outcomes [1, 1, 3, 2, 5, 2, 5, 6, 6, 2].
+          End scores = (8, 24)
+          >>> print(turns[1])
+          Start scores = (8, 24).
+          Player 1 rolls 2 dice and gets outcomes [6, 3].
+          End scores = (8, 33)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=93942, score0=42, score1=41, goal=43)
+          >>> print(turns[0])
+          Start scores = (42, 41).
+          Player 0 rolls 7 dice and gets outcomes [3, 6, 3, 3, 2, 6, 1].
+          End scores = (43, 41)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=48161, score0=15, score1=55, goal=83)
+          >>> print(turns[0])
+          Start scores = (15, 55).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (27, 55)
+          >>> print(turns[1])
+          Start scores = (27, 55).
+          Player 1 rolls 10 dice and gets outcomes [1, 4, 5, 6, 3, 6, 5, 4, 2, 5].
+          End scores = (27, 56)
+          >>> print(turns[2])
+          Start scores = (27, 56).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (37, 56)
+          >>> print(turns[3])
+          Start scores = (37, 56).
+          Player 1 rolls 1 dice and gets outcomes [3].
+          End scores = (37, 59)
+          >>> print(turns[4])
+          Start scores = (37, 59).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (38, 59)
+          >>> print(turns[5])
+          Start scores = (38, 59).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (38, 71)
+          >>> print(turns[6])
+          Start scores = (38, 71).
+          Player 0 rolls 10 dice and gets outcomes [3, 4, 3, 1, 6, 6, 1, 3, 2, 2].
+          End scores = (39, 71)
+          >>> print(turns[7])
+          Start scores = (39, 71).
+          Player 1 rolls 4 dice and gets outcomes [5, 3, 6, 1].
+          End scores = (39, 72)
+          >>> print(turns[8])
+          Start scores = (39, 72).
+          Player 0 rolls 7 dice and gets outcomes [3, 1, 2, 5, 4, 5, 4].
+          End scores = (40, 72)
+          >>> print(turns[9])
+          Start scores = (40, 72).
+          Player 1 rolls 2 dice and gets outcomes [5, 4].
+          End scores = (40, 81)
+          >>> print(turns[10])
+          Start scores = (40, 81).
+          Player 0 rolls 4 dice and gets outcomes [4, 2, 1, 3].
+          End scores = (41, 81)
+          >>> print(turns[11])
+          Start scores = (41, 81).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (41, 90)
+          >>> print(turns[12])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=52136, score0=2, score1=14, goal=15)
+          >>> print(turns[0])
+          Start scores = (2, 14).
+          Player 0 rolls 4 dice and gets outcomes [3, 3, 1, 5].
+          End scores = (3, 14)
+          >>> print(turns[1])
+          Start scores = (3, 14).
+          Player 1 rolls 1 dice and gets outcomes [1].
+          End scores = (3, 15)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=30971, score0=11, score1=12, goal=25)
+          >>> print(turns[0])
+          Start scores = (11, 12).
+          Player 0 rolls 9 dice and gets outcomes [2, 2, 1, 2, 6, 5, 4, 6, 3].
+          End scores = (12, 12)
+          >>> print(turns[1])
+          Start scores = (12, 12).
+          Player 0 rolls 4 dice and gets outcomes [3, 6, 4, 1].
+          End scores = (13, 12)
+          >>> print(turns[2])
+          Start scores = (13, 12).
+          Player 1 rolls 9 dice and gets outcomes [3, 3, 6, 5, 3, 5, 3, 2, 2].
+          End scores = (13, 44)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=69948, score0=11, score1=19, goal=43)
+          >>> print(turns[0])
+          Start scores = (11, 19).
+          Player 0 rolls 9 dice and gets outcomes [1, 5, 6, 6, 2, 6, 1, 6, 4].
+          End scores = (12, 19)
+          >>> print(turns[1])
+          Start scores = (12, 19).
+          Player 1 rolls 6 dice and gets outcomes [2, 3, 5, 6, 1, 3].
+          End scores = (12, 20)
+          >>> print(turns[2])
+          Start scores = (12, 20).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (21, 20)
+          >>> print(turns[3])
+          Start scores = (21, 20).
+          Player 1 rolls 4 dice and gets outcomes [1, 6, 4, 5].
+          End scores = (21, 21)
+          >>> print(turns[4])
+          Start scores = (21, 21).
+          Player 1 rolls 8 dice and gets outcomes [6, 6, 5, 6, 2, 3, 5, 4].
+          End scores = (21, 58)
+          >>> print(turns[5])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=33856, score0=9, score1=9, goal=19)
+          >>> print(turns[0])
+          Start scores = (9, 9).
+          Player 0 rolls 1 dice and gets outcomes [3].
           End scores = (12, 9)
           >>> print(turns[1])
+          Start scores = (12, 9).
+          Player 1 rolls 3 dice and gets outcomes [5, 5, 6].
+          End scores = (12, 25)
+          >>> print(turns[2])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=98858, score0=0, score1=20, goal=66, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=93176, score0=7, score1=37, goal=80)
           >>> print(turns[0])
-          Start scores = (0, 20).
-          Player 0 rolls 4 dice and gets outcomes [5, 1, 4, 1].
-          End scores = (4, 20)
-          >>> print(turns[1])
-          Start scores = (4, 20).
-          Player 1 rolls 2 dice and gets outcomes [6, 2].
-          End scores = (4, 28)
-          >>> print(turns[2])
-          Start scores = (4, 28).
-          Player 0 rolls 3 dice and gets outcomes [5, 6, 6].
-          End scores = (21, 28)
-          >>> print(turns[3])
-          Start scores = (21, 28).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (21, 31)
-          >>> print(turns[4])
-          Start scores = (21, 31).
-          Player 0 rolls 10 dice and gets outcomes [6, 5, 6, 4, 1, 5, 3, 6, 6, 6].
-          End scores = (22, 31)
-          >>> print(turns[5])
-          Start scores = (22, 31).
-          Player 1 rolls 6 dice and gets outcomes [2, 6, 4, 1, 4, 3].
-          End scores = (22, 32)
-          >>> print(turns[6])
-          Start scores = (22, 32).
-          Player 0 rolls 5 dice and gets outcomes [4, 2, 2, 5, 4].
-          End scores = (39, 32)
-          >>> print(turns[7])
-          Start scores = (39, 32).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (39, 45)
-          >>> print(turns[8])
-          Start scores = (39, 45).
+          Start scores = (7, 37).
           Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (42, 45)
-          >>> print(turns[9])
-          Start scores = (42, 45).
-          Player 1 rolls 4 dice and gets outcomes [4, 3, 2, 3].
-          End scores = (42, 57)
-          >>> print(turns[10])
-          Start scores = (42, 57).
-          Player 0 rolls 7 dice and gets outcomes [4, 4, 6, 6, 6, 2, 3].
-          End scores = (73, 57)
-          >>> print(turns[11])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=96385, score0=13, score1=20, goal=36, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (13, 20).
-          Player 0 rolls 1 dice and gets outcomes [6].
-          End scores = (19, 20)
+          End scores = (11, 37)
           >>> print(turns[1])
-          Start scores = (19, 20).
-          Player 1 rolls 6 dice and gets outcomes [5, 2, 3, 5, 2, 5].
-          End scores = (19, 42)
+          Start scores = (11, 37).
+          Player 1 rolls 5 dice and gets outcomes [6, 6, 6, 6, 3].
+          End scores = (11, 64)
           >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=66739, score0=5, score1=4, goal=11, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (5, 4).
+          Start scores = (11, 64).
           Player 0 rolls 2 dice and gets outcomes [6, 4].
-          End scores = (15, 4)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=88253, score0=8, score1=5, goal=35, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (8, 5).
+          End scores = (21, 64)
+          >>> print(turns[3])
+          Start scores = (21, 64).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (21, 69)
+          >>> print(turns[4])
+          Start scores = (21, 69).
+          Player 0 rolls 2 dice and gets outcomes [6, 4].
+          End scores = (31, 69)
+          >>> print(turns[5])
+          Start scores = (31, 69).
+          Player 1 rolls 2 dice and gets outcomes [1, 3].
+          End scores = (31, 70)
+          >>> print(turns[6])
+          Start scores = (31, 70).
+          Player 0 rolls 6 dice and gets outcomes [2, 6, 4, 6, 1, 4].
+          End scores = (32, 70)
+          >>> print(turns[7])
+          Start scores = (32, 70).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (32, 73)
+          >>> print(turns[8])
+          Start scores = (32, 73).
+          Player 0 rolls 9 dice and gets outcomes [4, 5, 5, 3, 1, 5, 1, 2, 1].
+          End scores = (33, 73)
+          >>> print(turns[9])
+          Start scores = (33, 73).
+          Player 1 rolls 6 dice and gets outcomes [2, 3, 6, 1, 4, 5].
+          End scores = (33, 74)
+          >>> print(turns[10])
+          Start scores = (33, 74).
           Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (19, 5)
-          >>> print(turns[1])
-          Start scores = (19, 5).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (19, 22)
-          >>> print(turns[2])
-          Start scores = (19, 22).
-          Player 0 rolls 1 dice and gets outcomes [1].
-          End scores = (20, 22)
-          >>> print(turns[3])
-          Start scores = (20, 22).
-          Player 1 rolls 5 dice and gets outcomes [4, 4, 2, 4, 2].
-          End scores = (20, 38)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=39236, score0=15, score1=32, goal=53, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (15, 32).
-          Player 0 rolls 2 dice and gets outcomes [1, 3].
-          End scores = (16, 32)
-          >>> print(turns[1])
-          Start scores = (16, 32).
-          Player 1 rolls 5 dice and gets outcomes [2, 4, 1, 4, 1].
-          End scores = (16, 33)
-          >>> print(turns[2])
-          Start scores = (16, 33).
-          Player 0 rolls 1 dice and gets outcomes [6].
-          End scores = (22, 33)
-          >>> print(turns[3])
-          Start scores = (22, 33).
-          Player 1 rolls 9 dice and gets outcomes [5, 4, 5, 4, 3, 3, 2, 1, 1].
-          End scores = (22, 34)
-          >>> print(turns[4])
-          Start scores = (22, 34).
-          Player 0 rolls 5 dice and gets outcomes [5, 6, 3, 6, 4].
-          End scores = (46, 34)
-          >>> print(turns[5])
-          Start scores = (46, 34).
-          Player 1 rolls 10 dice and gets outcomes [4, 2, 2, 2, 4, 5, 2, 4, 1, 3].
-          End scores = (46, 35)
-          >>> print(turns[6])
-          Start scores = (46, 35).
-          Player 0 rolls 5 dice and gets outcomes [5, 3, 5, 6, 5].
-          End scores = (70, 35)
-          >>> print(turns[7])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=73001, score0=15, score1=18, goal=23, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (15, 18).
-          Player 0 rolls 6 dice and gets outcomes [6, 4, 1, 2, 1, 4].
-          End scores = (16, 18)
-          >>> print(turns[1])
-          Start scores = (16, 18).
-          Player 1 rolls 8 dice and gets outcomes [5, 6, 2, 2, 2, 3, 3, 3].
-          End scores = (16, 44)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=6301, score0=47, score1=33, goal=71, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (47, 33).
-          Player 0 rolls 5 dice and gets outcomes [1, 6, 4, 5, 2].
-          End scores = (48, 33)
-          >>> print(turns[1])
-          Start scores = (48, 33).
-          Player 1 rolls 7 dice and gets outcomes [4, 5, 6, 5, 6, 1, 5].
-          End scores = (48, 34)
-          >>> print(turns[2])
-          Start scores = (48, 34).
-          Player 0 rolls 1 dice and gets outcomes [3].
-          End scores = (51, 34)
-          >>> print(turns[3])
-          Start scores = (51, 34).
-          Player 1 rolls 4 dice and gets outcomes [5, 4, 3, 3].
-          End scores = (51, 49)
-          >>> print(turns[4])
-          Start scores = (51, 49).
-          Player 0 rolls 6 dice and gets outcomes [5, 3, 1, 2, 2, 3].
-          End scores = (52, 49)
-          >>> print(turns[5])
-          Start scores = (52, 49).
-          Player 1 rolls 7 dice and gets outcomes [4, 1, 5, 3, 6, 2, 5].
-          End scores = (52, 50)
-          >>> print(turns[6])
-          Start scores = (52, 50).
-          Player 0 rolls 6 dice and gets outcomes [5, 5, 5, 2, 6, 2].
-          End scores = (77, 50)
-          >>> print(turns[7])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=96485, score0=51, score1=24, goal=85, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (51, 24).
-          Player 0 rolls 4 dice and gets outcomes [3, 4, 4, 1].
-          End scores = (52, 24)
-          >>> print(turns[1])
-          Start scores = (52, 24).
-          Player 1 rolls 2 dice and gets outcomes [1, 6].
-          End scores = (52, 36)
-          >>> print(turns[2])
-          Start scores = (52, 36).
-          Player 0 rolls 10 dice and gets outcomes [6, 6, 5, 5, 3, 5, 6, 5, 6, 3].
-          End scores = (102, 36)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=20652, score0=30, score1=3, goal=51, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (30, 3).
-          Player 0 rolls 7 dice and gets outcomes [3, 6, 3, 3, 2, 1, 2].
-          End scores = (31, 3)
-          >>> print(turns[1])
-          Start scores = (31, 3).
-          Player 1 rolls 3 dice and gets outcomes [5, 5, 5].
-          End scores = (31, 18)
-          >>> print(turns[2])
-          Start scores = (31, 18).
-          Player 0 rolls 10 dice and gets outcomes [5, 6, 1, 3, 3, 6, 3, 2, 1, 3].
-          End scores = (32, 18)
-          >>> print(turns[3])
-          Start scores = (32, 18).
-          Player 1 rolls 9 dice and gets outcomes [5, 3, 3, 6, 2, 3, 5, 1, 6].
-          End scores = (32, 19)
-          >>> print(turns[4])
-          Start scores = (32, 19).
-          Player 0 rolls 4 dice and gets outcomes [4, 6, 2, 1].
-          End scores = (33, 19)
-          >>> print(turns[5])
-          Start scores = (33, 19).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (33, 20)
-          >>> print(turns[6])
-          Start scores = (33, 20).
-          Player 0 rolls 2 dice and gets outcomes [2, 5].
-          End scores = (40, 20)
-          >>> print(turns[7])
-          Start scores = (40, 20).
-          Player 1 rolls 9 dice and gets outcomes [3, 4, 1, 6, 5, 1, 5, 6, 1].
-          End scores = (40, 21)
-          >>> print(turns[8])
-          Start scores = (40, 21).
-          Player 0 rolls 5 dice and gets outcomes [1, 3, 1, 2, 5].
-          End scores = (41, 21)
-          >>> print(turns[9])
-          Start scores = (41, 21).
-          Player 1 rolls 1 dice and gets outcomes [3].
-          End scores = (41, 24)
-          >>> print(turns[10])
-          Start scores = (41, 24).
-          Player 0 rolls 9 dice and gets outcomes [3, 5, 5, 3, 6, 2, 4, 3, 6].
-          End scores = (78, 24)
+          End scores = (44, 74)
           >>> print(turns[11])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=80360, score0=23, score1=11, goal=38, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (23, 11).
-          Player 0 rolls 1 dice and gets outcomes [2].
-          End scores = (25, 11)
-          >>> print(turns[1])
-          Start scores = (25, 11).
-          Player 1 rolls 2 dice and gets outcomes [6, 1].
-          End scores = (25, 12)
-          >>> print(turns[2])
-          Start scores = (25, 12).
-          Player 0 rolls 4 dice and gets outcomes [2, 1, 2, 1].
-          End scores = (26, 12)
-          >>> print(turns[3])
-          Start scores = (26, 12).
-          Player 1 rolls 8 dice and gets outcomes [2, 2, 5, 4, 2, 3, 5, 6].
-          End scores = (26, 41)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=53740, score0=21, score1=18, goal=56, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (21, 18).
-          Player 0 rolls 1 dice and gets outcomes [5].
-          End scores = (26, 18)
-          >>> print(turns[1])
-          Start scores = (26, 18).
-          Player 1 rolls 9 dice and gets outcomes [2, 3, 4, 6, 1, 4, 3, 5, 2].
-          End scores = (26, 19)
-          >>> print(turns[2])
-          Start scores = (26, 19).
-          Player 0 rolls 1 dice and gets outcomes [3].
-          End scores = (29, 19)
-          >>> print(turns[3])
-          Start scores = (29, 19).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (29, 34)
-          >>> print(turns[4])
-          Start scores = (29, 34).
-          Player 0 rolls 5 dice and gets outcomes [3, 3, 5, 2, 2].
-          End scores = (44, 34)
-          >>> print(turns[5])
-          Start scores = (44, 34).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (44, 39)
-          >>> print(turns[6])
-          Start scores = (44, 39).
-          Player 0 rolls 8 dice and gets outcomes [2, 1, 5, 4, 6, 3, 5, 2].
-          End scores = (45, 39)
-          >>> print(turns[7])
-          Start scores = (45, 39).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (45, 42)
-          >>> print(turns[8])
-          Start scores = (45, 42).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (49, 42)
-          >>> print(turns[9])
-          Start scores = (49, 42).
-          Player 1 rolls 5 dice and gets outcomes [6, 6, 1, 5, 3].
-          End scores = (49, 43)
-          >>> print(turns[10])
-          Start scores = (49, 43).
-          Player 0 rolls 7 dice and gets outcomes [1, 4, 6, 3, 1, 5, 5].
-          End scores = (50, 43)
-          >>> print(turns[11])
-          Start scores = (50, 43).
-          Player 1 rolls 5 dice and gets outcomes [2, 6, 1, 6, 6].
-          End scores = (50, 44)
+          Start scores = (44, 74).
+          Player 1 rolls 9 dice and gets outcomes [4, 4, 4, 6, 4, 1, 1, 1, 5].
+          End scores = (44, 75)
           >>> print(turns[12])
-          Start scores = (50, 44).
-          Player 0 rolls 10 dice and gets outcomes [5, 6, 2, 1, 5, 5, 5, 4, 5, 4].
-          End scores = (51, 44)
+          Start scores = (44, 75).
+          Player 0 rolls 8 dice and gets outcomes [5, 3, 1, 2, 4, 2, 1, 5].
+          End scores = (45, 75)
           >>> print(turns[13])
-          Start scores = (51, 44).
-          Player 1 rolls 2 dice and gets outcomes [1, 6].
-          End scores = (51, 45)
+          Start scores = (45, 75).
+          Player 0 rolls 6 dice and gets outcomes [3, 4, 5, 2, 6, 4].
+          End scores = (69, 75)
           >>> print(turns[14])
-          Start scores = (51, 45).
-          Player 0 rolls 3 dice and gets outcomes [4, 4, 2].
-          End scores = (61, 45)
+          Start scores = (69, 75).
+          Player 1 rolls 5 dice and gets outcomes [5, 2, 6, 4, 3].
+          End scores = (69, 95)
           >>> print(turns[15])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=53943, score0=29, score1=9, goal=50, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=85986, score0=35, score1=12, goal=74)
           >>> print(turns[0])
-          Start scores = (29, 9).
-          Player 0 rolls 4 dice and gets outcomes [6, 3, 3, 4].
-          End scores = (45, 9)
+          Start scores = (35, 12).
+          Player 0 rolls 10 dice and gets outcomes [6, 2, 3, 4, 3, 3, 6, 5, 1, 2].
+          End scores = (36, 12)
           >>> print(turns[1])
-          Start scores = (45, 9).
-          Player 1 rolls 9 dice and gets outcomes [4, 1, 5, 3, 3, 3, 4, 2, 3].
-          End scores = (45, 10)
+          Start scores = (36, 12).
+          Player 0 rolls 6 dice and gets outcomes [5, 3, 6, 1, 2, 3].
+          End scores = (37, 12)
           >>> print(turns[2])
-          Start scores = (45, 10).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (48, 10)
+          Start scores = (37, 12).
+          Player 1 rolls 6 dice and gets outcomes [3, 6, 4, 2, 5, 1].
+          End scores = (37, 13)
           >>> print(turns[3])
-          Start scores = (48, 10).
-          Player 1 rolls 10 dice and gets outcomes [6, 6, 5, 3, 4, 1, 4, 1, 1, 3].
-          End scores = (48, 11)
+          Start scores = (37, 13).
+          Player 0 rolls 6 dice and gets outcomes [6, 3, 6, 4, 3, 3].
+          End scores = (62, 13)
           >>> print(turns[4])
-          Start scores = (48, 11).
-          Player 0 rolls 8 dice and gets outcomes [6, 3, 3, 6, 6, 2, 1, 6].
-          End scores = (64, 11)
+          Start scores = (62, 13).
+          Player 1 rolls 5 dice and gets outcomes [5, 2, 2, 3, 4].
+          End scores = (62, 29)
           >>> print(turns[5])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=85875, score0=21, score1=66, goal=67, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (21, 66).
-          Player 0 rolls 2 dice and gets outcomes [2, 1].
-          End scores = (22, 66)
-          >>> print(turns[1])
-          Start scores = (22, 66).
-          Player 1 rolls 4 dice and gets outcomes [5, 5, 2, 2].
-          End scores = (22, 80)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=20869, score0=28, score1=16, goal=39, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (28, 16).
-          Player 0 rolls 7 dice and gets outcomes [4, 5, 4, 5, 2, 3, 1].
-          End scores = (29, 16)
-          >>> print(turns[1])
-          Start scores = (29, 16).
-          Player 1 rolls 3 dice and gets outcomes [1, 6, 2].
-          End scores = (29, 17)
-          >>> print(turns[2])
-          Start scores = (29, 17).
-          Player 0 rolls 6 dice and gets outcomes [6, 1, 1, 2, 2, 6].
-          End scores = (30, 17)
-          >>> print(turns[3])
-          Start scores = (30, 17).
-          Player 1 rolls 9 dice and gets outcomes [6, 4, 4, 2, 5, 6, 1, 5, 5].
-          End scores = (30, 18)
-          >>> print(turns[4])
-          Start scores = (30, 18).
-          Player 0 rolls 10 dice and gets outcomes [2, 5, 2, 4, 6, 2, 1, 4, 6, 3].
-          End scores = (31, 18)
-          >>> print(turns[5])
-          Start scores = (31, 18).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (31, 23)
+          Start scores = (62, 29).
+          Player 0 rolls 7 dice and gets outcomes [5, 6, 3, 6, 5, 5, 5].
+          End scores = (97, 29)
           >>> print(turns[6])
-          Start scores = (31, 23).
-          Player 0 rolls 6 dice and gets outcomes [4, 4, 1, 1, 6, 5].
-          End scores = (32, 23)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=76820, score0=28, score1=14, goal=61)
+          >>> print(turns[0])
+          Start scores = (28, 14).
+          Player 0 rolls 4 dice and gets outcomes [2, 6, 4, 1].
+          End scores = (29, 14)
+          >>> print(turns[1])
+          Start scores = (29, 14).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (29, 24)
+          >>> print(turns[2])
+          Start scores = (29, 24).
+          Player 0 rolls 7 dice and gets outcomes [1, 1, 1, 3, 3, 6, 6].
+          End scores = (30, 24)
+          >>> print(turns[3])
+          Start scores = (30, 24).
+          Player 1 rolls 4 dice and gets outcomes [6, 4, 2, 5].
+          End scores = (30, 41)
+          >>> print(turns[4])
+          Start scores = (30, 41).
+          Player 0 rolls 2 dice and gets outcomes [4, 1].
+          End scores = (31, 41)
+          >>> print(turns[5])
+          Start scores = (31, 41).
+          Player 1 rolls 6 dice and gets outcomes [5, 5, 3, 6, 5, 4].
+          End scores = (31, 69)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=83984, score0=64, score1=49, goal=78)
+          >>> print(turns[0])
+          Start scores = (64, 49).
+          Player 0 rolls 7 dice and gets outcomes [3, 5, 3, 5, 6, 3, 4].
+          End scores = (93, 49)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=25773, score0=3, score1=17, goal=30)
+          >>> print(turns[0])
+          Start scores = (3, 17).
+          Player 0 rolls 5 dice and gets outcomes [3, 4, 5, 4, 6].
+          End scores = (25, 17)
+          >>> print(turns[1])
+          Start scores = (25, 17).
+          Player 1 rolls 3 dice and gets outcomes [2, 1, 4].
+          End scores = (25, 18)
+          >>> print(turns[2])
+          Start scores = (25, 18).
+          Player 0 rolls 4 dice and gets outcomes [5, 1, 5, 3].
+          End scores = (26, 18)
+          >>> print(turns[3])
+          Start scores = (26, 18).
+          Player 1 rolls 8 dice and gets outcomes [1, 4, 3, 2, 1, 5, 6, 2].
+          End scores = (26, 19)
+          >>> print(turns[4])
+          Start scores = (26, 19).
+          Player 0 rolls 9 dice and gets outcomes [6, 5, 6, 2, 1, 5, 2, 1, 1].
+          End scores = (27, 19)
+          >>> print(turns[5])
+          Start scores = (27, 19).
+          Player 1 rolls 10 dice and gets outcomes [5, 6, 6, 4, 2, 5, 3, 3, 2, 4].
+          End scores = (27, 59)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=6012, score0=30, score1=3, goal=85)
+          >>> print(turns[0])
+          Start scores = (30, 3).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (34, 3)
+          >>> print(turns[1])
+          Start scores = (34, 3).
+          Player 1 rolls 9 dice and gets outcomes [1, 4, 6, 2, 4, 2, 4, 2, 4].
+          End scores = (34, 4)
+          >>> print(turns[2])
+          Start scores = (34, 4).
+          Player 0 rolls 10 dice and gets outcomes [3, 3, 4, 6, 4, 4, 6, 6, 6, 5].
+          End scores = (81, 4)
+          >>> print(turns[3])
+          Start scores = (81, 4).
+          Player 1 rolls 10 dice and gets outcomes [5, 1, 1, 4, 2, 4, 5, 3, 3, 4].
+          End scores = (81, 5)
+          >>> print(turns[4])
+          Start scores = (81, 5).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (93, 5)
+          >>> print(turns[5])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=56692, score0=69, score1=40, goal=71)
+          >>> print(turns[0])
+          Start scores = (69, 40).
+          Player 0 rolls 6 dice and gets outcomes [6, 4, 6, 4, 4, 1].
+          End scores = (70, 40)
+          >>> print(turns[1])
+          Start scores = (70, 40).
+          Player 0 rolls 7 dice and gets outcomes [3, 3, 4, 5, 5, 6, 2].
+          End scores = (98, 40)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=11528, score0=6, score1=7, goal=17)
+          >>> print(turns[0])
+          Start scores = (6, 7).
+          Player 0 rolls 3 dice and gets outcomes [2, 6, 2].
+          End scores = (16, 7)
+          >>> print(turns[1])
+          Start scores = (16, 7).
+          Player 1 rolls 8 dice and gets outcomes [6, 3, 1, 5, 2, 6, 5, 5].
+          End scores = (16, 8)
+          >>> print(turns[2])
+          Start scores = (16, 8).
+          Player 0 rolls 4 dice and gets outcomes [5, 2, 2, 1].
+          End scores = (17, 8)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=95684, score0=3, score1=1, goal=10)
+          >>> print(turns[0])
+          Start scores = (3, 1).
+          Player 0 rolls 1 dice and gets outcomes [3].
+          End scores = (6, 1)
+          >>> print(turns[1])
+          Start scores = (6, 1).
+          Player 1 rolls 8 dice and gets outcomes [4, 1, 3, 5, 1, 6, 2, 6].
+          End scores = (6, 2)
+          >>> print(turns[2])
+          Start scores = (6, 2).
+          Player 0 rolls 5 dice and gets outcomes [1, 4, 5, 5, 4].
+          End scores = (7, 2)
+          >>> print(turns[3])
+          Start scores = (7, 2).
+          Player 1 rolls 2 dice and gets outcomes [3, 3].
+          End scores = (7, 8)
+          >>> print(turns[4])
+          Start scores = (7, 8).
+          Player 0 rolls 3 dice and gets outcomes [2, 2, 5].
+          End scores = (16, 8)
+          >>> print(turns[5])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=81397, score0=45, score1=40, goal=52)
+          >>> print(turns[0])
+          Start scores = (45, 40).
+          Player 0 rolls 3 dice and gets outcomes [6, 5, 3].
+          End scores = (59, 40)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=22637, score0=32, score1=11, goal=58)
+          >>> print(turns[0])
+          Start scores = (32, 11).
+          Player 0 rolls 5 dice and gets outcomes [6, 6, 5, 5, 5].
+          End scores = (59, 11)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=11998, score0=16, score1=21, goal=67)
+          >>> print(turns[0])
+          Start scores = (16, 21).
+          Player 0 rolls 1 dice and gets outcomes [4].
+          End scores = (20, 21)
+          >>> print(turns[1])
+          Start scores = (20, 21).
+          Player 0 rolls 8 dice and gets outcomes [2, 3, 5, 6, 3, 3, 6, 2].
+          End scores = (50, 21)
+          >>> print(turns[2])
+          Start scores = (50, 21).
+          Player 1 rolls 7 dice and gets outcomes [1, 6, 4, 5, 3, 4, 6].
+          End scores = (50, 22)
+          >>> print(turns[3])
+          Start scores = (50, 22).
+          Player 0 rolls 10 dice and gets outcomes [2, 3, 4, 2, 3, 4, 3, 6, 2, 5].
+          End scores = (84, 22)
+          >>> print(turns[4])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=69783, score0=11, score1=13, goal=38)
+          >>> print(turns[0])
+          Start scores = (11, 13).
+          Player 0 rolls 2 dice and gets outcomes [4, 6].
+          End scores = (21, 13)
+          >>> print(turns[1])
+          Start scores = (21, 13).
+          Player 1 rolls 1 dice and gets outcomes [6].
+          End scores = (21, 19)
+          >>> print(turns[2])
+          Start scores = (21, 19).
+          Player 1 rolls 9 dice and gets outcomes [4, 4, 5, 6, 4, 3, 5, 1, 1].
+          End scores = (21, 20)
+          >>> print(turns[3])
+          Start scores = (21, 20).
+          Player 1 rolls 1 dice and gets outcomes [1].
+          End scores = (21, 21)
+          >>> print(turns[4])
+          Start scores = (21, 21).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (21, 26)
+          >>> print(turns[5])
+          Start scores = (21, 26).
+          Player 0 rolls 2 dice and gets outcomes [6, 6].
+          End scores = (33, 26)
+          >>> print(turns[6])
+          Start scores = (33, 26).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (33, 31)
           >>> print(turns[7])
-          Start scores = (32, 23).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (32, 28)
+          Start scores = (33, 31).
+          Player 1 rolls 3 dice and gets outcomes [3, 6, 5].
+          End scores = (33, 45)
           >>> print(turns[8])
-          Start scores = (32, 28).
-          Player 0 rolls 8 dice and gets outcomes [5, 2, 2, 4, 4, 1, 4, 1].
-          End scores = (33, 28)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=37364, score0=29, score1=22, goal=35)
+          >>> print(turns[0])
+          Start scores = (29, 22).
+          Player 0 rolls 4 dice and gets outcomes [1, 6, 1, 6].
+          End scores = (30, 22)
+          >>> print(turns[1])
+          Start scores = (30, 22).
+          Player 1 rolls 3 dice and gets outcomes [5, 6, 6].
+          End scores = (30, 39)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=5143, score0=2, score1=15, goal=79)
+          >>> print(turns[0])
+          Start scores = (2, 15).
+          Player 0 rolls 5 dice and gets outcomes [4, 6, 6, 6, 4].
+          End scores = (28, 15)
+          >>> print(turns[1])
+          Start scores = (28, 15).
+          Player 1 rolls 1 dice and gets outcomes [4].
+          End scores = (28, 19)
+          >>> print(turns[2])
+          Start scores = (28, 19).
+          Player 0 rolls 5 dice and gets outcomes [3, 3, 2, 3, 4].
+          End scores = (43, 19)
+          >>> print(turns[3])
+          Start scores = (43, 19).
+          Player 1 rolls 6 dice and gets outcomes [6, 2, 2, 2, 4, 3].
+          End scores = (43, 38)
+          >>> print(turns[4])
+          Start scores = (43, 38).
+          Player 0 rolls 4 dice and gets outcomes [3, 3, 6, 1].
+          End scores = (44, 38)
+          >>> print(turns[5])
+          Start scores = (44, 38).
+          Player 1 rolls 3 dice and gets outcomes [4, 5, 1].
+          End scores = (44, 39)
+          >>> print(turns[6])
+          Start scores = (44, 39).
+          Player 0 rolls 1 dice and gets outcomes [5].
+          End scores = (49, 39)
+          >>> print(turns[7])
+          Start scores = (49, 39).
+          Player 1 rolls 3 dice and gets outcomes [5, 3, 2].
+          End scores = (49, 49)
+          >>> print(turns[8])
+          Start scores = (49, 49).
+          Player 1 rolls 9 dice and gets outcomes [1, 2, 6, 2, 1, 5, 2, 5, 3].
+          End scores = (49, 50)
           >>> print(turns[9])
-          Start scores = (33, 28).
-          Player 1 rolls 8 dice and gets outcomes [5, 2, 6, 2, 5, 3, 5, 3].
-          End scores = (33, 59)
+          Start scores = (49, 50).
+          Player 0 rolls 8 dice and gets outcomes [3, 2, 4, 4, 4, 2, 4, 6].
+          End scores = (78, 50)
+          >>> print(turns[10])
+          Start scores = (78, 50).
+          Player 1 rolls 10 dice and gets outcomes [2, 5, 6, 4, 1, 5, 2, 2, 4, 2].
+          End scores = (78, 51)
+          >>> print(turns[11])
+          Start scores = (78, 51).
+          Player 0 rolls 2 dice and gets outcomes [3, 2].
+          End scores = (83, 51)
+          >>> print(turns[12])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=82888, score0=26, score1=39, goal=87)
+          >>> print(turns[0])
+          Start scores = (26, 39).
+          Player 0 rolls 9 dice and gets outcomes [4, 4, 3, 4, 3, 6, 5, 2, 6].
+          End scores = (63, 39)
+          >>> print(turns[1])
+          Start scores = (63, 39).
+          Player 1 rolls 2 dice and gets outcomes [6, 6].
+          End scores = (63, 51)
+          >>> print(turns[2])
+          Start scores = (63, 51).
+          Player 0 rolls 7 dice and gets outcomes [3, 1, 2, 4, 4, 5, 5].
+          End scores = (64, 51)
+          >>> print(turns[3])
+          Start scores = (64, 51).
+          Player 1 rolls 7 dice and gets outcomes [4, 4, 2, 2, 5, 3, 3].
+          End scores = (64, 74)
+          >>> print(turns[4])
+          Start scores = (64, 74).
+          Player 0 rolls 4 dice and gets outcomes [4, 1, 2, 6].
+          End scores = (65, 74)
+          >>> print(turns[5])
+          Start scores = (65, 74).
+          Player 1 rolls 2 dice and gets outcomes [1, 6].
+          End scores = (65, 75)
+          >>> print(turns[6])
+          Start scores = (65, 75).
+          Player 0 rolls 7 dice and gets outcomes [2, 1, 4, 3, 1, 4, 1].
+          End scores = (66, 75)
+          >>> print(turns[7])
+          Start scores = (66, 75).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (66, 85)
+          >>> print(turns[8])
+          Start scores = (66, 85).
+          Player 0 rolls 4 dice and gets outcomes [1, 6, 3, 2].
+          End scores = (67, 85)
+          >>> print(turns[9])
+          Start scores = (67, 85).
+          Player 1 rolls 9 dice and gets outcomes [5, 5, 2, 1, 2, 4, 2, 3, 6].
+          End scores = (67, 86)
+          >>> print(turns[10])
+          Start scores = (67, 86).
+          Player 0 rolls 8 dice and gets outcomes [6, 5, 6, 1, 5, 5, 2, 6].
+          End scores = (68, 86)
+          >>> print(turns[11])
+          Start scores = (68, 86).
+          Player 1 rolls 10 dice and gets outcomes [6, 4, 2, 6, 6, 4, 1, 5, 3, 6].
+          End scores = (68, 87)
+          >>> print(turns[12])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=25835, score0=15, score1=64, goal=95)
+          >>> print(turns[0])
+          Start scores = (15, 64).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (21, 64)
+          >>> print(turns[1])
+          Start scores = (21, 64).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (21, 69)
+          >>> print(turns[2])
+          Start scores = (21, 69).
+          Player 0 rolls 2 dice and gets outcomes [3, 2].
+          End scores = (26, 69)
+          >>> print(turns[3])
+          Start scores = (26, 69).
+          Player 1 rolls 6 dice and gets outcomes [3, 4, 3, 1, 2, 1].
+          End scores = (26, 70)
+          >>> print(turns[4])
+          Start scores = (26, 70).
+          Player 0 rolls 1 dice and gets outcomes [3].
+          End scores = (29, 70)
+          >>> print(turns[5])
+          Start scores = (29, 70).
+          Player 1 rolls 5 dice and gets outcomes [1, 6, 6, 4, 4].
+          End scores = (29, 71)
+          >>> print(turns[6])
+          Start scores = (29, 71).
+          Player 0 rolls 3 dice and gets outcomes [2, 3, 4].
+          End scores = (38, 71)
+          >>> print(turns[7])
+          Start scores = (38, 71).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (38, 83)
+          >>> print(turns[8])
+          Start scores = (38, 83).
+          Player 0 rolls 7 dice and gets outcomes [2, 5, 3, 1, 6, 6, 4].
+          End scores = (39, 83)
+          >>> print(turns[9])
+          Start scores = (39, 83).
+          Player 1 rolls 3 dice and gets outcomes [5, 5, 4].
+          End scores = (39, 97)
           >>> print(turns[10])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=98819, score0=10, score1=37, goal=50, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=85071, score0=86, score1=5, goal=89)
           >>> print(turns[0])
-          Start scores = (10, 37).
-          Player 0 rolls 8 dice and gets outcomes [4, 3, 5, 4, 6, 1, 4, 3].
-          End scores = (11, 37)
+          Start scores = (86, 5).
+          Player 0 rolls 7 dice and gets outcomes [1, 3, 2, 6, 4, 5, 6].
+          End scores = (87, 5)
           >>> print(turns[1])
-          Start scores = (11, 37).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (11, 42)
-          >>> print(turns[2])
-          Start scores = (11, 42).
-          Player 0 rolls 5 dice and gets outcomes [3, 4, 5, 4, 4].
-          End scores = (31, 42)
-          >>> print(turns[3])
-          Start scores = (31, 42).
+          Start scores = (87, 5).
           Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (31, 47)
+          End scores = (87, 12)
+          >>> print(turns[2])
+          Start scores = (87, 12).
+          Player 0 rolls 4 dice and gets outcomes [6, 6, 1, 3].
+          End scores = (88, 12)
+          >>> print(turns[3])
+          Start scores = (88, 12).
+          Player 1 rolls 5 dice and gets outcomes [5, 6, 6, 5, 5].
+          End scores = (88, 39)
           >>> print(turns[4])
-          Start scores = (31, 47).
+          Start scores = (88, 39).
+          Player 0 rolls 6 dice and gets outcomes [3, 4, 4, 2, 5, 5].
+          End scores = (111, 39)
+          >>> print(turns[5])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=23577, score0=32, score1=23, goal=45)
+          >>> print(turns[0])
+          Start scores = (32, 23).
+          Player 0 rolls 7 dice and gets outcomes [1, 4, 6, 5, 3, 6, 4].
+          End scores = (33, 23)
+          >>> print(turns[1])
+          Start scores = (33, 23).
+          Player 1 rolls 8 dice and gets outcomes [2, 1, 3, 5, 3, 6, 6, 5].
+          End scores = (33, 24)
+          >>> print(turns[2])
+          Start scores = (33, 24).
           Player 0 rolls 1 dice and gets outcomes [1].
-          End scores = (32, 47)
-          >>> print(turns[5])
-          Start scores = (32, 47).
-          Player 1 rolls 6 dice and gets outcomes [1, 1, 6, 4, 6, 5].
-          End scores = (32, 48)
-          >>> print(turns[6])
-          Start scores = (32, 48).
-          Player 0 rolls 10 dice and gets outcomes [5, 2, 3, 5, 4, 5, 6, 5, 4, 4].
-          End scores = (75, 48)
-          >>> print(turns[7])
+          End scores = (34, 24)
+          >>> print(turns[3])
+          Start scores = (34, 24).
+          Player 1 rolls 7 dice and gets outcomes [4, 4, 5, 2, 6, 4, 2].
+          End scores = (34, 51)
+          >>> print(turns[4])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=82794, score0=60, score1=43, goal=61, update=hog.simple_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=663, score0=44, score1=13, goal=59)
           >>> print(turns[0])
-          Start scores = (60, 43).
-          Player 0 rolls 3 dice and gets outcomes [3, 5, 2].
-          End scores = (70, 43)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=83069, score0=7, score1=76, goal=80, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (7, 76).
-          Player 0 rolls 10 dice and gets outcomes [1, 5, 2, 6, 4, 6, 1, 1, 2, 5].
-          End scores = (8, 76)
-          >>> print(turns[1])
-          Start scores = (8, 76).
-          Player 1 rolls 4 dice and gets outcomes [4, 4, 5, 5].
-          End scores = (8, 94)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=95167, score0=30, score1=33, goal=60, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (30, 33).
-          Player 0 rolls 10 dice and gets outcomes [6, 6, 6, 5, 3, 3, 3, 3, 4, 5].
-          End scores = (74, 33)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=70738, score0=16, score1=15, goal=23, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (16, 15).
-          Player 0 rolls 7 dice and gets outcomes [2, 3, 5, 2, 1, 2, 4].
-          End scores = (17, 15)
-          >>> print(turns[1])
-          Start scores = (17, 15).
-          Player 1 rolls 4 dice and gets outcomes [4, 1, 1, 3].
-          End scores = (17, 16)
-          >>> print(turns[2])
-          Start scores = (17, 16).
+          Start scores = (44, 13).
           Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (28, 16)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=28923, score0=8, score1=25, goal=50, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (8, 25).
-          Player 0 rolls 8 dice and gets outcomes [5, 1, 1, 2, 5, 2, 2, 1].
-          End scores = (16, 25)
+          End scores = (54, 13)
           >>> print(turns[1])
-          Start scores = (16, 25).
-          Player 1 rolls 10 dice and gets outcomes [6, 2, 2, 1, 6, 1, 1, 3, 1, 1].
-          End scores = (16, 26)
+          Start scores = (54, 13).
+          Player 1 rolls 4 dice and gets outcomes [5, 6, 6, 4].
+          End scores = (54, 34)
           >>> print(turns[2])
-          Start scores = (16, 26).
-          Player 0 rolls 2 dice and gets outcomes [2, 3].
-          End scores = (21, 26)
-          >>> print(turns[3])
-          Start scores = (21, 26).
-          Player 1 rolls 4 dice and gets outcomes [3, 3, 6, 2].
-          End scores = (21, 40)
-          >>> print(turns[4])
-          Start scores = (21, 40).
-          Player 0 rolls 8 dice and gets outcomes [6, 3, 1, 3, 5, 4, 1, 1].
-          End scores = (22, 40)
-          >>> print(turns[5])
-          Start scores = (22, 40).
-          Player 1 rolls 4 dice and gets outcomes [4, 2, 6, 1].
-          End scores = (22, 41)
-          >>> print(turns[6])
-          Start scores = (22, 41).
-          Player 0 rolls 3 dice and gets outcomes [3, 3, 5].
-          End scores = (33, 41)
-          >>> print(turns[7])
-          Start scores = (33, 41).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (33, 42)
-          >>> print(turns[8])
-          Start scores = (33, 42).
-          Player 0 rolls 8 dice and gets outcomes [2, 6, 2, 2, 6, 4, 3, 6].
-          End scores = (81, 42)
-          >>> print(turns[9])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=58200, score0=32, score1=95, goal=99, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (32, 95).
-          Player 0 rolls 6 dice and gets outcomes [5, 3, 4, 6, 1, 5].
-          End scores = (33, 95)
-          >>> print(turns[1])
-          Start scores = (33, 95).
-          Player 1 rolls 2 dice and gets outcomes [2, 5].
-          End scores = (33, 102)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=72093, score0=5, score1=20, goal=31, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (5, 20).
+          Start scores = (54, 34).
           Player 0 rolls 1 dice and gets outcomes [5].
-          End scores = (10, 20)
-          >>> print(turns[1])
-          Start scores = (10, 20).
-          Player 1 rolls 9 dice and gets outcomes [3, 4, 3, 5, 2, 6, 1, 3, 2].
-          End scores = (10, 21)
-          >>> print(turns[2])
-          Start scores = (10, 21).
-          Player 0 rolls 7 dice and gets outcomes [3, 2, 6, 5, 3, 4, 5].
-          End scores = (38, 21)
+          End scores = (59, 34)
           >>> print(turns[3])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=71578, score0=16, score1=49, goal=81, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=6543, score0=65, score1=70, goal=87)
           >>> print(turns[0])
-          Start scores = (16, 49).
-          Player 0 rolls 6 dice and gets outcomes [4, 3, 2, 1, 6, 3].
-          End scores = (17, 49)
+          Start scores = (65, 70).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (72, 70)
           >>> print(turns[1])
-          Start scores = (17, 49).
-          Player 1 rolls 10 dice and gets outcomes [6, 3, 6, 6, 2, 1, 2, 6, 3, 1].
-          End scores = (17, 50)
+          Start scores = (72, 70).
+          Player 1 rolls 8 dice and gets outcomes [5, 3, 3, 3, 2, 3, 6, 6].
+          End scores = (72, 101)
           >>> print(turns[2])
-          Start scores = (17, 50).
-          Player 0 rolls 5 dice and gets outcomes [2, 5, 3, 5, 3].
-          End scores = (35, 50)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=31919, score0=2, score1=16, goal=28)
+          >>> print(turns[0])
+          Start scores = (2, 16).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (7, 16)
+          >>> print(turns[1])
+          Start scores = (7, 16).
+          Player 1 rolls 6 dice and gets outcomes [5, 6, 2, 2, 3, 2].
+          End scores = (7, 36)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=67699, score0=24, score1=17, goal=28)
+          >>> print(turns[0])
+          Start scores = (24, 17).
+          Player 0 rolls 5 dice and gets outcomes [2, 1, 3, 6, 6].
+          End scores = (25, 17)
+          >>> print(turns[1])
+          Start scores = (25, 17).
+          Player 1 rolls 2 dice and gets outcomes [4, 3].
+          End scores = (25, 24)
+          >>> print(turns[2])
+          Start scores = (25, 24).
+          Player 1 rolls 1 dice and gets outcomes [5].
+          End scores = (25, 29)
           >>> print(turns[3])
-          Start scores = (35, 50).
-          Player 1 rolls 10 dice and gets outcomes [3, 1, 3, 3, 5, 2, 5, 2, 6, 3].
-          End scores = (35, 51)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=25815, score0=52, score1=11, goal=54)
+          >>> print(turns[0])
+          Start scores = (52, 11).
+          Player 0 rolls 9 dice and gets outcomes [5, 5, 5, 4, 2, 4, 3, 1, 5].
+          End scores = (53, 11)
+          >>> print(turns[1])
+          Start scores = (53, 11).
+          Player 1 rolls 5 dice and gets outcomes [1, 2, 1, 2, 6].
+          End scores = (53, 12)
+          >>> print(turns[2])
+          Start scores = (53, 12).
+          Player 0 rolls 6 dice and gets outcomes [4, 5, 6, 3, 1, 4].
+          End scores = (54, 12)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=41969, score0=38, score1=54, goal=78)
+          >>> print(turns[0])
+          Start scores = (38, 54).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (39, 54)
+          >>> print(turns[1])
+          Start scores = (39, 54).
+          Player 1 rolls 4 dice and gets outcomes [1, 2, 5, 6].
+          End scores = (39, 55)
+          >>> print(turns[2])
+          Start scores = (39, 55).
+          Player 0 rolls 3 dice and gets outcomes [2, 4, 1].
+          End scores = (40, 55)
+          >>> print(turns[3])
+          Start scores = (40, 55).
+          Player 1 rolls 8 dice and gets outcomes [4, 5, 6, 4, 2, 2, 5, 2].
+          End scores = (40, 85)
           >>> print(turns[4])
-          Start scores = (35, 51).
-          Player 0 rolls 10 dice and gets outcomes [5, 5, 4, 3, 6, 1, 5, 3, 2, 2].
-          End scores = (49, 51)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=68309, score0=53, score1=40, goal=56)
+          >>> print(turns[0])
+          Start scores = (53, 40).
+          Player 0 rolls 7 dice and gets outcomes [2, 4, 3, 5, 6, 2, 2].
+          End scores = (77, 40)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=8243, score0=28, score1=23, goal=30)
+          >>> print(turns[0])
+          Start scores = (28, 23).
+          Player 0 rolls 6 dice and gets outcomes [4, 2, 5, 2, 6, 5].
+          End scores = (52, 23)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=43015, score0=53, score1=74, goal=77)
+          >>> print(turns[0])
+          Start scores = (53, 74).
+          Player 0 rolls 10 dice and gets outcomes [5, 6, 6, 6, 1, 4, 3, 5, 3, 2].
+          End scores = (54, 74)
+          >>> print(turns[1])
+          Start scores = (54, 74).
+          Player 1 rolls 5 dice and gets outcomes [1, 6, 5, 4, 6].
+          End scores = (54, 75)
+          >>> print(turns[2])
+          Start scores = (54, 75).
+          Player 0 rolls 9 dice and gets outcomes [2, 3, 2, 4, 4, 6, 4, 5, 3].
+          End scores = (87, 75)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=76012, score0=39, score1=36, goal=73)
+          >>> print(turns[0])
+          Start scores = (39, 36).
+          Player 0 rolls 2 dice and gets outcomes [1, 4].
+          End scores = (40, 36)
+          >>> print(turns[1])
+          Start scores = (40, 36).
+          Player 1 rolls 2 dice and gets outcomes [6, 6].
+          End scores = (40, 48)
+          >>> print(turns[2])
+          Start scores = (40, 48).
+          Player 0 rolls 4 dice and gets outcomes [6, 6, 6, 2].
+          End scores = (60, 48)
+          >>> print(turns[3])
+          Start scores = (60, 48).
+          Player 0 rolls 5 dice and gets outcomes [1, 3, 3, 2, 3].
+          End scores = (61, 48)
+          >>> print(turns[4])
+          Start scores = (61, 48).
+          Player 1 rolls 2 dice and gets outcomes [5, 3].
+          End scores = (61, 56)
           >>> print(turns[5])
-          Start scores = (49, 51).
-          Player 1 rolls 9 dice and gets outcomes [2, 4, 6, 3, 6, 6, 5, 5, 5].
+          Start scores = (61, 56).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (71, 56)
+          >>> print(turns[6])
+          Start scores = (71, 56).
+          Player 1 rolls 1 dice and gets outcomes [6].
+          End scores = (71, 62)
+          >>> print(turns[7])
+          Start scores = (71, 62).
+          Player 0 rolls 4 dice and gets outcomes [2, 6, 3, 5].
+          End scores = (87, 62)
+          >>> print(turns[8])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=9818, score0=11, score1=9, goal=64)
+          >>> print(turns[0])
+          Start scores = (11, 9).
+          Player 0 rolls 10 dice and gets outcomes [2, 5, 3, 3, 6, 6, 4, 1, 1, 2].
+          End scores = (12, 9)
+          >>> print(turns[1])
+          Start scores = (12, 9).
+          Player 1 rolls 4 dice and gets outcomes [4, 1, 2, 6].
+          End scores = (12, 10)
+          >>> print(turns[2])
+          Start scores = (12, 10).
+          Player 1 rolls 7 dice and gets outcomes [3, 4, 2, 6, 5, 5, 4].
+          End scores = (12, 39)
+          >>> print(turns[3])
+          Start scores = (12, 39).
+          Player 0 rolls 6 dice and gets outcomes [2, 3, 3, 6, 6, 3].
+          End scores = (35, 39)
+          >>> print(turns[4])
+          Start scores = (35, 39).
+          Player 1 rolls 10 dice and gets outcomes [1, 5, 3, 3, 3, 2, 6, 3, 2, 5].
+          End scores = (35, 40)
+          >>> print(turns[5])
+          Start scores = (35, 40).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (39, 40)
+          >>> print(turns[6])
+          Start scores = (39, 40).
+          Player 0 rolls 5 dice and gets outcomes [4, 4, 4, 5, 4].
+          End scores = (60, 40)
+          >>> print(turns[7])
+          Start scores = (60, 40).
+          Player 0 rolls 2 dice and gets outcomes [2, 3].
+          End scores = (65, 40)
+          >>> print(turns[8])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=25916, score0=86, score1=24, goal=88)
+          >>> print(turns[0])
+          Start scores = (86, 24).
+          Player 0 rolls 5 dice and gets outcomes [4, 1, 5, 5, 1].
+          End scores = (87, 24)
+          >>> print(turns[1])
+          Start scores = (87, 24).
+          Player 1 rolls 8 dice and gets outcomes [5, 4, 4, 2, 5, 2, 2, 2].
+          End scores = (87, 50)
+          >>> print(turns[2])
+          Start scores = (87, 50).
+          Player 0 rolls 7 dice and gets outcomes [1, 2, 4, 1, 6, 4, 2].
+          End scores = (88, 50)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=15583, score0=11, score1=40, goal=55)
+          >>> print(turns[0])
+          Start scores = (11, 40).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (15, 40)
+          >>> print(turns[1])
+          Start scores = (15, 40).
+          Player 1 rolls 9 dice and gets outcomes [1, 2, 3, 5, 4, 4, 2, 5, 1].
+          End scores = (15, 41)
+          >>> print(turns[2])
+          Start scores = (15, 41).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (24, 41)
+          >>> print(turns[3])
+          Start scores = (24, 41).
+          Player 1 rolls 5 dice and gets outcomes [2, 1, 2, 1, 4].
+          End scores = (24, 42)
+          >>> print(turns[4])
+          Start scores = (24, 42).
+          Player 0 rolls 7 dice and gets outcomes [6, 4, 2, 1, 3, 3, 5].
+          End scores = (25, 42)
+          >>> print(turns[5])
+          Start scores = (25, 42).
+          Player 1 rolls 9 dice and gets outcomes [4, 3, 4, 1, 3, 5, 2, 2, 2].
+          End scores = (25, 43)
+          >>> print(turns[6])
+          Start scores = (25, 43).
+          Player 0 rolls 2 dice and gets outcomes [5, 4].
+          End scores = (34, 43)
+          >>> print(turns[7])
+          Start scores = (34, 43).
+          Player 1 rolls 8 dice and gets outcomes [1, 4, 4, 4, 3, 5, 1, 3].
+          End scores = (34, 44)
+          >>> print(turns[8])
+          Start scores = (34, 44).
+          Player 0 rolls 7 dice and gets outcomes [5, 2, 4, 1, 6, 5, 3].
+          End scores = (35, 44)
+          >>> print(turns[9])
+          Start scores = (35, 44).
+          Player 1 rolls 6 dice and gets outcomes [6, 3, 6, 1, 4, 5].
+          End scores = (35, 45)
+          >>> print(turns[10])
+          Start scores = (35, 45).
+          Player 0 rolls 6 dice and gets outcomes [6, 2, 2, 5, 3, 4].
+          End scores = (57, 45)
+          >>> print(turns[11])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=7242, score0=19, score1=46, goal=98)
+          >>> print(turns[0])
+          Start scores = (19, 46).
+          Player 0 rolls 8 dice and gets outcomes [2, 2, 3, 5, 4, 1, 1, 3].
+          End scores = (20, 46)
+          >>> print(turns[1])
+          Start scores = (20, 46).
+          Player 1 rolls 8 dice and gets outcomes [1, 1, 6, 6, 5, 3, 1, 4].
+          End scores = (20, 47)
+          >>> print(turns[2])
+          Start scores = (20, 47).
+          Player 0 rolls 10 dice and gets outcomes [4, 5, 4, 6, 1, 1, 6, 2, 3, 1].
+          End scores = (21, 47)
+          >>> print(turns[3])
+          Start scores = (21, 47).
+          Player 1 rolls 7 dice and gets outcomes [1, 5, 4, 4, 5, 3, 2].
+          End scores = (21, 48)
+          >>> print(turns[4])
+          Start scores = (21, 48).
+          Player 0 rolls 4 dice and gets outcomes [2, 1, 1, 1].
+          End scores = (22, 48)
+          >>> print(turns[5])
+          Start scores = (22, 48).
+          Player 1 rolls 5 dice and gets outcomes [1, 1, 6, 6, 3].
+          End scores = (22, 49)
+          >>> print(turns[6])
+          Start scores = (22, 49).
+          Player 0 rolls 6 dice and gets outcomes [5, 3, 2, 2, 3, 4].
+          End scores = (41, 49)
+          >>> print(turns[7])
+          Start scores = (41, 49).
+          Player 1 rolls 6 dice and gets outcomes [5, 3, 1, 6, 1, 6].
+          End scores = (41, 50)
+          >>> print(turns[8])
+          Start scores = (41, 50).
+          Player 0 rolls 5 dice and gets outcomes [6, 3, 2, 1, 1].
+          End scores = (42, 50)
+          >>> print(turns[9])
+          Start scores = (42, 50).
+          Player 1 rolls 4 dice and gets outcomes [3, 6, 3, 1].
+          End scores = (42, 51)
+          >>> print(turns[10])
+          Start scores = (42, 51).
+          Player 0 rolls 10 dice and gets outcomes [6, 3, 2, 2, 5, 6, 2, 6, 3, 3].
+          End scores = (80, 51)
+          >>> print(turns[11])
+          Start scores = (80, 51).
+          Player 1 rolls 2 dice and gets outcomes [6, 4].
+          End scores = (80, 61)
+          >>> print(turns[12])
+          Start scores = (80, 61).
+          Player 0 rolls 1 dice and gets outcomes [4].
+          End scores = (84, 61)
+          >>> print(turns[13])
+          Start scores = (84, 61).
+          Player 1 rolls 4 dice and gets outcomes [4, 1, 4, 2].
+          End scores = (84, 62)
+          >>> print(turns[14])
+          Start scores = (84, 62).
+          Player 0 rolls 4 dice and gets outcomes [5, 5, 1, 3].
+          End scores = (85, 62)
+          >>> print(turns[15])
+          Start scores = (85, 62).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (85, 65)
+          >>> print(turns[16])
+          Start scores = (85, 65).
+          Player 0 rolls 9 dice and gets outcomes [4, 1, 2, 1, 5, 3, 1, 2, 3].
+          End scores = (86, 65)
+          >>> print(turns[17])
+          Start scores = (86, 65).
+          Player 1 rolls 9 dice and gets outcomes [3, 1, 5, 4, 3, 2, 1, 6, 3].
+          End scores = (86, 66)
+          >>> print(turns[18])
+          Start scores = (86, 66).
+          Player 0 rolls 7 dice and gets outcomes [6, 5, 5, 6, 2, 4, 5].
+          End scores = (119, 66)
+          >>> print(turns[19])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=74122, score0=18, score1=14, goal=32)
+          >>> print(turns[0])
+          Start scores = (18, 14).
+          Player 0 rolls 7 dice and gets outcomes [3, 2, 5, 2, 2, 6, 1].
+          End scores = (19, 14)
+          >>> print(turns[1])
+          Start scores = (19, 14).
+          Player 1 rolls 3 dice and gets outcomes [1, 3, 3].
+          End scores = (19, 15)
+          >>> print(turns[2])
+          Start scores = (19, 15).
+          Player 0 rolls 9 dice and gets outcomes [5, 3, 4, 3, 6, 3, 2, 5, 6].
+          End scores = (56, 15)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=59593, score0=27, score1=9, goal=40)
+          >>> print(turns[0])
+          Start scores = (27, 9).
+          Player 0 rolls 1 dice and gets outcomes [5].
+          End scores = (32, 9)
+          >>> print(turns[1])
+          Start scores = (32, 9).
+          Player 1 rolls 4 dice and gets outcomes [4, 4, 2, 2].
+          End scores = (32, 21)
+          >>> print(turns[2])
+          Start scores = (32, 21).
+          Player 0 rolls 1 dice and gets outcomes [5].
+          End scores = (37, 21)
+          >>> print(turns[3])
+          Start scores = (37, 21).
+          Player 1 rolls 6 dice and gets outcomes [4, 6, 2, 2, 4, 4].
+          End scores = (37, 43)
+          >>> print(turns[4])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=8128, score0=17, score1=8, goal=29)
+          >>> print(turns[0])
+          Start scores = (17, 8).
+          Player 0 rolls 4 dice and gets outcomes [4, 2, 4, 5].
+          End scores = (32, 8)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=22810, score0=7, score1=0, goal=43)
+          >>> print(turns[0])
+          Start scores = (7, 0).
+          Player 0 rolls 2 dice and gets outcomes [5, 3].
+          End scores = (15, 0)
+          >>> print(turns[1])
+          Start scores = (15, 0).
+          Player 1 rolls 2 dice and gets outcomes [2, 1].
+          End scores = (15, 1)
+          >>> print(turns[2])
+          Start scores = (15, 1).
+          Player 0 rolls 8 dice and gets outcomes [4, 1, 1, 3, 1, 4, 3, 5].
+          End scores = (16, 1)
+          >>> print(turns[3])
+          Start scores = (16, 1).
+          Player 1 rolls 1 dice and gets outcomes [3].
+          End scores = (16, 4)
+          >>> print(turns[4])
+          Start scores = (16, 4).
+          Player 0 rolls 10 dice and gets outcomes [5, 1, 6, 3, 1, 5, 4, 3, 1, 2].
+          End scores = (17, 4)
+          >>> print(turns[5])
+          Start scores = (17, 4).
+          Player 1 rolls 2 dice and gets outcomes [6, 5].
+          End scores = (17, 15)
+          >>> print(turns[6])
+          Start scores = (17, 15).
+          Player 1 rolls 9 dice and gets outcomes [5, 4, 6, 6, 6, 2, 1, 5, 2].
+          End scores = (17, 16)
+          >>> print(turns[7])
+          Start scores = (17, 16).
+          Player 1 rolls 10 dice and gets outcomes [4, 4, 5, 5, 6, 6, 3, 5, 4, 1].
+          End scores = (17, 17)
+          >>> print(turns[8])
+          Start scores = (17, 17).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (17, 23)
+          >>> print(turns[9])
+          Start scores = (17, 23).
+          Player 0 rolls 6 dice and gets outcomes [5, 6, 5, 2, 3, 6].
+          End scores = (44, 23)
+          >>> print(turns[10])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=59348, score0=95, score1=84, goal=97)
+          >>> print(turns[0])
+          Start scores = (95, 84).
+          Player 0 rolls 1 dice and gets outcomes [2].
+          End scores = (97, 84)
+          >>> print(turns[1])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=88169, score0=23, score1=40, goal=79)
+          >>> print(turns[0])
+          Start scores = (23, 40).
+          Player 0 rolls 3 dice and gets outcomes [1, 5, 6].
+          End scores = (24, 40)
+          >>> print(turns[1])
+          Start scores = (24, 40).
+          Player 1 rolls 7 dice and gets outcomes [2, 6, 6, 6, 2, 3, 3].
+          End scores = (24, 68)
+          >>> print(turns[2])
+          Start scores = (24, 68).
+          Player 0 rolls 3 dice and gets outcomes [6, 5, 4].
+          End scores = (39, 68)
+          >>> print(turns[3])
+          Start scores = (39, 68).
+          Player 1 rolls 5 dice and gets outcomes [2, 3, 5, 1, 6].
+          End scores = (39, 69)
+          >>> print(turns[4])
+          Start scores = (39, 69).
+          Player 0 rolls 3 dice and gets outcomes [3, 2, 5].
+          End scores = (49, 69)
+          >>> print(turns[5])
+          Start scores = (49, 69).
+          Player 1 rolls 5 dice and gets outcomes [6, 6, 4, 5, 3].
           End scores = (49, 93)
           >>> print(turns[6])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=72869, score0=5, score1=4, goal=11, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=70467, score0=61, score1=74, goal=97)
           >>> print(turns[0])
-          Start scores = (5, 4).
-          Player 0 rolls 2 dice and gets outcomes [3, 1].
-          End scores = (6, 4)
-          >>> print(turns[1])
-          Start scores = (6, 4).
-          Player 1 rolls 4 dice and gets outcomes [5, 4, 4, 4].
-          End scores = (6, 21)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=66473, score0=39, score1=74, goal=81, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (39, 74).
-          Player 0 rolls 6 dice and gets outcomes [5, 3, 3, 1, 5, 4].
-          End scores = (40, 74)
-          >>> print(turns[1])
-          Start scores = (40, 74).
-          Player 1 rolls 3 dice and gets outcomes [3, 3, 1].
-          End scores = (40, 75)
-          >>> print(turns[2])
-          Start scores = (40, 75).
-          Player 0 rolls 4 dice and gets outcomes [6, 3, 4, 5].
-          End scores = (58, 75)
-          >>> print(turns[3])
-          Start scores = (58, 75).
-          Player 1 rolls 5 dice and gets outcomes [4, 4, 5, 2, 3].
-          End scores = (58, 93)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=43296, score0=56, score1=14, goal=69, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (56, 14).
-          Player 0 rolls 5 dice and gets outcomes [5, 3, 1, 4, 5].
-          End scores = (57, 14)
-          >>> print(turns[1])
-          Start scores = (57, 14).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (57, 19)
-          >>> print(turns[2])
-          Start scores = (57, 19).
-          Player 0 rolls 4 dice and gets outcomes [3, 5, 1, 4].
-          End scores = (58, 19)
-          >>> print(turns[3])
-          Start scores = (58, 19).
-          Player 1 rolls 5 dice and gets outcomes [5, 6, 4, 6, 4].
-          End scores = (58, 44)
-          >>> print(turns[4])
-          Start scores = (58, 44).
-          Player 0 rolls 10 dice and gets outcomes [3, 4, 6, 2, 6, 3, 1, 3, 2, 4].
-          End scores = (59, 44)
-          >>> print(turns[5])
-          Start scores = (59, 44).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (59, 53)
-          >>> print(turns[6])
-          Start scores = (59, 53).
-          Player 0 rolls 4 dice and gets outcomes [2, 2, 2, 1].
-          End scores = (60, 53)
-          >>> print(turns[7])
-          Start scores = (60, 53).
-          Player 1 rolls 3 dice and gets outcomes [6, 1, 3].
-          End scores = (60, 54)
-          >>> print(turns[8])
-          Start scores = (60, 54).
-          Player 0 rolls 3 dice and gets outcomes [2, 4, 4].
-          End scores = (70, 54)
-          >>> print(turns[9])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=15289, score0=61, score1=5, goal=69, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (61, 5).
-          Player 0 rolls 5 dice and gets outcomes [6, 4, 6, 5, 4].
-          End scores = (86, 5)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=13609, score0=14, score1=0, goal=15, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (14, 0).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (15, 0)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=99130, score0=70, score1=53, goal=72, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (70, 53).
-          Player 0 rolls 2 dice and gets outcomes [5, 3].
-          End scores = (78, 53)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=32108, score0=9, score1=37, goal=93, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (9, 37).
-          Player 0 rolls 9 dice and gets outcomes [1, 2, 1, 2, 2, 5, 2, 6, 5].
-          End scores = (10, 37)
-          >>> print(turns[1])
-          Start scores = (10, 37).
-          Player 1 rolls 4 dice and gets outcomes [4, 2, 6, 4].
-          End scores = (10, 53)
-          >>> print(turns[2])
-          Start scores = (10, 53).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (15, 53)
-          >>> print(turns[3])
-          Start scores = (15, 53).
-          Player 1 rolls 1 dice and gets outcomes [3].
-          End scores = (15, 56)
-          >>> print(turns[4])
-          Start scores = (15, 56).
-          Player 0 rolls 5 dice and gets outcomes [6, 6, 2, 1, 4].
-          End scores = (25, 56)
-          >>> print(turns[5])
-          Start scores = (25, 56).
-          Player 1 rolls 7 dice and gets outcomes [5, 2, 2, 1, 5, 1, 4].
-          End scores = (25, 57)
-          >>> print(turns[6])
-          Start scores = (25, 57).
-          Player 0 rolls 5 dice and gets outcomes [6, 3, 2, 6, 4].
-          End scores = (46, 57)
-          >>> print(turns[7])
-          Start scores = (46, 57).
-          Player 1 rolls 6 dice and gets outcomes [4, 2, 2, 1, 3, 5].
-          End scores = (46, 58)
-          >>> print(turns[8])
-          Start scores = (46, 58).
-          Player 0 rolls 4 dice and gets outcomes [1, 2, 3, 4].
-          End scores = (47, 58)
-          >>> print(turns[9])
-          Start scores = (47, 58).
-          Player 1 rolls 8 dice and gets outcomes [2, 1, 2, 3, 3, 6, 5, 3].
-          End scores = (47, 59)
-          >>> print(turns[10])
-          Start scores = (47, 59).
-          Player 0 rolls 7 dice and gets outcomes [5, 4, 2, 6, 1, 2, 2].
-          End scores = (48, 59)
-          >>> print(turns[11])
-          Start scores = (48, 59).
-          Player 1 rolls 5 dice and gets outcomes [6, 2, 2, 2, 1].
-          End scores = (48, 60)
-          >>> print(turns[12])
-          Start scores = (48, 60).
-          Player 0 rolls 10 dice and gets outcomes [6, 2, 1, 4, 4, 4, 4, 2, 2, 5].
-          End scores = (64, 60)
-          >>> print(turns[13])
-          Start scores = (64, 60).
-          Player 1 rolls 8 dice and gets outcomes [3, 3, 6, 1, 2, 1, 6, 3].
-          End scores = (64, 61)
-          >>> print(turns[14])
-          Start scores = (64, 61).
-          Player 0 rolls 3 dice and gets outcomes [5, 5, 5].
-          End scores = (79, 61)
-          >>> print(turns[15])
-          Start scores = (79, 61).
-          Player 1 rolls 6 dice and gets outcomes [3, 5, 6, 3, 2, 4].
-          End scores = (79, 84)
-          >>> print(turns[16])
-          Start scores = (79, 84).
-          Player 0 rolls 7 dice and gets outcomes [3, 4, 2, 6, 2, 4, 3].
-          End scores = (103, 84)
-          >>> print(turns[17])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=2069, score0=55, score1=37, goal=64, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (55, 37).
-          Player 0 rolls 9 dice and gets outcomes [3, 3, 2, 5, 5, 6, 5, 4, 1].
-          End scores = (56, 37)
-          >>> print(turns[1])
-          Start scores = (56, 37).
-          Player 1 rolls 3 dice and gets outcomes [3, 3, 2].
-          End scores = (56, 45)
-          >>> print(turns[2])
-          Start scores = (56, 45).
-          Player 0 rolls 9 dice and gets outcomes [6, 1, 1, 3, 5, 5, 1, 1, 5].
-          End scores = (57, 45)
-          >>> print(turns[3])
-          Start scores = (57, 45).
-          Player 1 rolls 4 dice and gets outcomes [5, 4, 6, 2].
-          End scores = (57, 62)
-          >>> print(turns[4])
-          Start scores = (57, 62).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (66, 62)
-          >>> print(turns[5])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=39055, score0=54, score1=8, goal=64, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (54, 8).
-          Player 0 rolls 6 dice and gets outcomes [5, 6, 3, 4, 5, 5].
-          End scores = (82, 8)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=65291, score0=4, score1=3, goal=23, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (4, 3).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (11, 3)
-          >>> print(turns[1])
-          Start scores = (11, 3).
-          Player 1 rolls 7 dice and gets outcomes [4, 5, 1, 1, 1, 6, 5].
-          End scores = (11, 4)
-          >>> print(turns[2])
-          Start scores = (11, 4).
-          Player 0 rolls 7 dice and gets outcomes [5, 3, 3, 2, 2, 2, 5].
-          End scores = (33, 4)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=76703, score0=25, score1=24, goal=76, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (25, 24).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (30, 24)
-          >>> print(turns[1])
-          Start scores = (30, 24).
-          Player 1 rolls 6 dice and gets outcomes [4, 6, 5, 5, 3, 6].
-          End scores = (30, 53)
-          >>> print(turns[2])
-          Start scores = (30, 53).
-          Player 0 rolls 7 dice and gets outcomes [2, 6, 3, 4, 6, 4, 3].
-          End scores = (58, 53)
-          >>> print(turns[3])
-          Start scores = (58, 53).
-          Player 1 rolls 10 dice and gets outcomes [2, 5, 6, 2, 1, 5, 5, 5, 1, 3].
-          End scores = (58, 54)
-          >>> print(turns[4])
-          Start scores = (58, 54).
-          Player 0 rolls 8 dice and gets outcomes [1, 4, 2, 6, 3, 5, 5, 6].
-          End scores = (59, 54)
-          >>> print(turns[5])
-          Start scores = (59, 54).
-          Player 1 rolls 1 dice and gets outcomes [3].
-          End scores = (59, 57)
-          >>> print(turns[6])
-          Start scores = (59, 57).
-          Player 0 rolls 7 dice and gets outcomes [2, 3, 6, 1, 4, 2, 5].
-          End scores = (60, 57)
-          >>> print(turns[7])
-          Start scores = (60, 57).
-          Player 1 rolls 1 dice and gets outcomes [1].
-          End scores = (60, 58)
-          >>> print(turns[8])
-          Start scores = (60, 58).
-          Player 0 rolls 7 dice and gets outcomes [3, 4, 6, 5, 1, 4, 2].
-          End scores = (61, 58)
-          >>> print(turns[9])
-          Start scores = (61, 58).
-          Player 1 rolls 3 dice and gets outcomes [4, 2, 1].
-          End scores = (61, 59)
-          >>> print(turns[10])
-          Start scores = (61, 59).
-          Player 0 rolls 8 dice and gets outcomes [3, 5, 2, 5, 6, 5, 5, 5].
-          End scores = (97, 59)
-          >>> print(turns[11])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=27707, score0=55, score1=8, goal=66, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (55, 8).
-          Player 0 rolls 8 dice and gets outcomes [5, 1, 5, 6, 5, 4, 1, 4].
-          End scores = (56, 8)
-          >>> print(turns[1])
-          Start scores = (56, 8).
-          Player 1 rolls 8 dice and gets outcomes [6, 3, 1, 6, 5, 2, 1, 1].
-          End scores = (56, 9)
-          >>> print(turns[2])
-          Start scores = (56, 9).
-          Player 0 rolls 1 dice and gets outcomes [2].
-          End scores = (58, 9)
-          >>> print(turns[3])
-          Start scores = (58, 9).
-          Player 1 rolls 3 dice and gets outcomes [3, 1, 2].
-          End scores = (58, 10)
-          >>> print(turns[4])
-          Start scores = (58, 10).
-          Player 0 rolls 8 dice and gets outcomes [6, 2, 3, 5, 4, 2, 2, 5].
-          End scores = (87, 10)
-          >>> print(turns[5])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=95614, score0=21, score1=52, goal=74, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (21, 52).
-          Player 0 rolls 4 dice and gets outcomes [4, 5, 4, 5].
-          End scores = (39, 52)
-          >>> print(turns[1])
-          Start scores = (39, 52).
-          Player 1 rolls 8 dice and gets outcomes [6, 2, 6, 4, 3, 1, 3, 6].
-          End scores = (39, 53)
-          >>> print(turns[2])
-          Start scores = (39, 53).
-          Player 0 rolls 1 dice and gets outcomes [2].
-          End scores = (41, 53)
-          >>> print(turns[3])
-          Start scores = (41, 53).
-          Player 1 rolls 2 dice and gets outcomes [5, 1].
-          End scores = (41, 54)
-          >>> print(turns[4])
-          Start scores = (41, 54).
-          Player 0 rolls 3 dice and gets outcomes [5, 6, 2].
-          End scores = (54, 54)
-          >>> print(turns[5])
-          Start scores = (54, 54).
-          Player 1 rolls 5 dice and gets outcomes [3, 2, 4, 1, 4].
-          End scores = (54, 55)
-          >>> print(turns[6])
-          Start scores = (54, 55).
-          Player 0 rolls 6 dice and gets outcomes [1, 4, 6, 3, 3, 2].
-          End scores = (55, 55)
-          >>> print(turns[7])
-          Start scores = (55, 55).
-          Player 1 rolls 6 dice and gets outcomes [5, 2, 5, 5, 5, 4].
-          End scores = (55, 100)
-          >>> print(turns[8])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=59761, score0=37, score1=12, goal=81, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (37, 12).
-          Player 0 rolls 9 dice and gets outcomes [5, 2, 6, 2, 5, 1, 4, 3, 5].
-          End scores = (38, 12)
-          >>> print(turns[1])
-          Start scores = (38, 12).
-          Player 1 rolls 7 dice and gets outcomes [5, 5, 4, 3, 2, 1, 6].
-          End scores = (38, 13)
-          >>> print(turns[2])
-          Start scores = (38, 13).
-          Player 0 rolls 4 dice and gets outcomes [4, 5, 6, 5].
-          End scores = (58, 13)
-          >>> print(turns[3])
-          Start scores = (58, 13).
-          Player 1 rolls 2 dice and gets outcomes [5, 5].
-          End scores = (58, 23)
-          >>> print(turns[4])
-          Start scores = (58, 23).
-          Player 0 rolls 4 dice and gets outcomes [5, 2, 1, 4].
-          End scores = (59, 23)
-          >>> print(turns[5])
-          Start scores = (59, 23).
-          Player 1 rolls 1 dice and gets outcomes [2].
-          End scores = (59, 25)
-          >>> print(turns[6])
-          Start scores = (59, 25).
-          Player 0 rolls 2 dice and gets outcomes [2, 4].
-          End scores = (65, 25)
-          >>> print(turns[7])
-          Start scores = (65, 25).
-          Player 1 rolls 4 dice and gets outcomes [2, 3, 3, 3].
-          End scores = (65, 36)
-          >>> print(turns[8])
-          Start scores = (65, 36).
-          Player 0 rolls 5 dice and gets outcomes [5, 5, 6, 5, 5].
-          End scores = (91, 36)
-          >>> print(turns[9])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=12023, score0=20, score1=6, goal=42, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (20, 6).
-          Player 0 rolls 4 dice and gets outcomes [1, 1, 5, 2].
-          End scores = (21, 6)
-          >>> print(turns[1])
-          Start scores = (21, 6).
-          Player 1 rolls 10 dice and gets outcomes [6, 1, 2, 6, 2, 3, 5, 5, 5, 3].
-          End scores = (21, 7)
-          >>> print(turns[2])
-          Start scores = (21, 7).
-          Player 0 rolls 2 dice and gets outcomes [2, 4].
-          End scores = (27, 7)
-          >>> print(turns[3])
-          Start scores = (27, 7).
-          Player 1 rolls 7 dice and gets outcomes [3, 5, 5, 5, 1, 3, 5].
-          End scores = (27, 8)
-          >>> print(turns[4])
-          Start scores = (27, 8).
-          Player 0 rolls 4 dice and gets outcomes [1, 4, 2, 5].
-          End scores = (28, 8)
-          >>> print(turns[5])
-          Start scores = (28, 8).
-          Player 1 rolls 7 dice and gets outcomes [4, 6, 2, 3, 6, 4, 4].
-          End scores = (28, 37)
-          >>> print(turns[6])
-          Start scores = (28, 37).
-          Player 0 rolls 2 dice and gets outcomes [1, 6].
-          End scores = (29, 37)
-          >>> print(turns[7])
-          Start scores = (29, 37).
-          Player 1 rolls 5 dice and gets outcomes [4, 2, 5, 1, 4].
-          End scores = (29, 38)
-          >>> print(turns[8])
-          Start scores = (29, 38).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (33, 38)
-          >>> print(turns[9])
-          Start scores = (33, 38).
-          Player 1 rolls 3 dice and gets outcomes [6, 1, 1].
-          End scores = (33, 39)
-          >>> print(turns[10])
-          Start scores = (33, 39).
-          Player 0 rolls 2 dice and gets outcomes [1, 2].
-          End scores = (34, 39)
-          >>> print(turns[11])
-          Start scores = (34, 39).
-          Player 1 rolls 7 dice and gets outcomes [2, 6, 1, 2, 1, 2, 1].
-          End scores = (34, 40)
-          >>> print(turns[12])
-          Start scores = (34, 40).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (38, 40)
-          >>> print(turns[13])
-          Start scores = (38, 40).
-          Player 1 rolls 10 dice and gets outcomes [1, 4, 4, 1, 2, 1, 4, 1, 5, 1].
-          End scores = (38, 41)
-          >>> print(turns[14])
-          Start scores = (38, 41).
-          Player 0 rolls 6 dice and gets outcomes [1, 5, 3, 5, 2, 5].
-          End scores = (39, 41)
-          >>> print(turns[15])
-          Start scores = (39, 41).
-          Player 1 rolls 1 dice and gets outcomes [1].
-          End scores = (39, 42)
-          >>> print(turns[16])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=9065, score0=45, score1=30, goal=46, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (45, 30).
-          Player 0 rolls 1 dice and gets outcomes [2].
-          End scores = (47, 30)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=52376, score0=72, score1=18, goal=75, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (72, 18).
-          Player 0 rolls 4 dice and gets outcomes [4, 4, 5, 3].
-          End scores = (88, 18)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=47323, score0=23, score1=6, goal=92, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (23, 6).
-          Player 0 rolls 2 dice and gets outcomes [4, 1].
-          End scores = (24, 6)
-          >>> print(turns[1])
-          Start scores = (24, 6).
-          Player 1 rolls 6 dice and gets outcomes [4, 1, 6, 2, 5, 4].
-          End scores = (24, 7)
-          >>> print(turns[2])
-          Start scores = (24, 7).
-          Player 0 rolls 7 dice and gets outcomes [2, 3, 5, 2, 4, 5, 4].
-          End scores = (49, 7)
-          >>> print(turns[3])
-          Start scores = (49, 7).
-          Player 1 rolls 9 dice and gets outcomes [3, 4, 2, 5, 6, 5, 6, 2, 4].
-          End scores = (49, 44)
-          >>> print(turns[4])
-          Start scores = (49, 44).
-          Player 0 rolls 7 dice and gets outcomes [6, 2, 6, 2, 1, 1, 2].
-          End scores = (50, 44)
-          >>> print(turns[5])
-          Start scores = (50, 44).
-          Player 1 rolls 9 dice and gets outcomes [5, 4, 3, 1, 4, 1, 1, 1, 4].
-          End scores = (50, 45)
-          >>> print(turns[6])
-          Start scores = (50, 45).
-          Player 0 rolls 6 dice and gets outcomes [6, 4, 4, 2, 6, 5].
-          End scores = (77, 45)
-          >>> print(turns[7])
-          Start scores = (77, 45).
-          Player 1 rolls 4 dice and gets outcomes [6, 1, 1, 6].
-          End scores = (77, 46)
-          >>> print(turns[8])
-          Start scores = (77, 46).
-          Player 0 rolls 7 dice and gets outcomes [6, 1, 1, 4, 5, 3, 1].
-          End scores = (78, 46)
-          >>> print(turns[9])
-          Start scores = (78, 46).
-          Player 1 rolls 3 dice and gets outcomes [5, 5, 5].
-          End scores = (78, 61)
-          >>> print(turns[10])
-          Start scores = (78, 61).
-          Player 0 rolls 3 dice and gets outcomes [1, 4, 1].
-          End scores = (79, 61)
-          >>> print(turns[11])
-          Start scores = (79, 61).
-          Player 1 rolls 7 dice and gets outcomes [2, 5, 3, 5, 3, 1, 5].
-          End scores = (79, 62)
-          >>> print(turns[12])
-          Start scores = (79, 62).
-          Player 0 rolls 9 dice and gets outcomes [2, 1, 2, 4, 6, 1, 2, 5, 4].
-          End scores = (80, 62)
-          >>> print(turns[13])
-          Start scores = (80, 62).
-          Player 1 rolls 3 dice and gets outcomes [6, 3, 4].
-          End scores = (80, 75)
-          >>> print(turns[14])
-          Start scores = (80, 75).
-          Player 0 rolls 7 dice and gets outcomes [1, 6, 1, 2, 2, 3, 1].
-          End scores = (81, 75)
-          >>> print(turns[15])
-          Start scores = (81, 75).
-          Player 1 rolls 7 dice and gets outcomes [4, 3, 3, 3, 4, 6, 4].
-          End scores = (81, 102)
-          >>> print(turns[16])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=44237, score0=12, score1=79, goal=89, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (12, 79).
-          Player 0 rolls 3 dice and gets outcomes [3, 3, 4].
-          End scores = (22, 79)
-          >>> print(turns[1])
-          Start scores = (22, 79).
-          Player 1 rolls 5 dice and gets outcomes [5, 4, 3, 6, 3].
-          End scores = (22, 121)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=27065, score0=2, score1=0, goal=12, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (2, 0).
-          Player 0 rolls 5 dice and gets outcomes [5, 2, 2, 1, 3].
-          End scores = (3, 0)
-          >>> print(turns[1])
-          Start scores = (3, 0).
-          Player 1 rolls 3 dice and gets outcomes [2, 1, 3].
-          End scores = (3, 4)
-          >>> print(turns[2])
-          Start scores = (3, 4).
-          Player 0 rolls 2 dice and gets outcomes [4, 5].
-          End scores = (12, 4)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=37376, score0=71, score1=22, goal=97, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (71, 22).
-          Player 0 rolls 5 dice and gets outcomes [6, 3, 1, 2, 5].
-          End scores = (72, 22)
-          >>> print(turns[1])
-          Start scores = (72, 22).
-          Player 1 rolls 3 dice and gets outcomes [3, 6, 6].
-          End scores = (72, 37)
-          >>> print(turns[2])
-          Start scores = (72, 37).
-          Player 0 rolls 9 dice and gets outcomes [6, 2, 5, 3, 2, 2, 2, 5, 4].
-          End scores = (103, 37)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=97077, score0=13, score1=2, goal=17, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (13, 2).
-          Player 0 rolls 10 dice and gets outcomes [1, 5, 3, 4, 3, 1, 5, 5, 1, 6].
-          End scores = (14, 2)
-          >>> print(turns[1])
-          Start scores = (14, 2).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (14, 16)
-          >>> print(turns[2])
-          Start scores = (14, 16).
-          Player 0 rolls 1 dice and gets outcomes [6].
-          End scores = (20, 16)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=66508, score0=38, score1=25, goal=97, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (38, 25).
-          Player 0 rolls 1 dice and gets outcomes [6].
-          End scores = (44, 25)
-          >>> print(turns[1])
-          Start scores = (44, 25).
-          Player 1 rolls 4 dice and gets outcomes [4, 4, 2, 3].
-          End scores = (44, 38)
-          >>> print(turns[2])
-          Start scores = (44, 38).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (55, 38)
-          >>> print(turns[3])
-          Start scores = (55, 38).
-          Player 1 rolls 5 dice and gets outcomes [1, 5, 3, 4, 2].
-          End scores = (55, 39)
-          >>> print(turns[4])
-          Start scores = (55, 39).
-          Player 0 rolls 10 dice and gets outcomes [4, 3, 1, 6, 2, 5, 2, 2, 2, 6].
-          End scores = (56, 39)
-          >>> print(turns[5])
-          Start scores = (56, 39).
-          Player 1 rolls 10 dice and gets outcomes [4, 3, 3, 6, 1, 6, 6, 6, 1, 1].
-          End scores = (56, 40)
-          >>> print(turns[6])
-          Start scores = (56, 40).
-          Player 0 rolls 5 dice and gets outcomes [2, 2, 2, 3, 6].
-          End scores = (71, 40)
-          >>> print(turns[7])
-          Start scores = (71, 40).
-          Player 1 rolls 9 dice and gets outcomes [4, 5, 3, 2, 3, 1, 3, 5, 3].
-          End scores = (71, 41)
-          >>> print(turns[8])
-          Start scores = (71, 41).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (78, 41)
-          >>> print(turns[9])
-          Start scores = (78, 41).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (78, 44)
-          >>> print(turns[10])
-          Start scores = (78, 44).
-          Player 0 rolls 5 dice and gets outcomes [2, 6, 3, 6, 3].
-          End scores = (98, 44)
-          >>> print(turns[11])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=75418, score0=2, score1=5, goal=11, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (2, 5).
+          Start scores = (61, 74).
           Player 0 rolls 2 dice and gets outcomes [4, 4].
-          End scores = (10, 5)
+          End scores = (69, 74)
           >>> print(turns[1])
-          Start scores = (10, 5).
-          Player 1 rolls 7 dice and gets outcomes [6, 3, 6, 1, 4, 6, 5].
-          End scores = (10, 6)
+          Start scores = (69, 74).
+          Player 1 rolls 8 dice and gets outcomes [6, 4, 3, 1, 5, 1, 5, 6].
+          End scores = (69, 75)
           >>> print(turns[2])
-          Start scores = (10, 6).
-          Player 0 rolls 7 dice and gets outcomes [6, 1, 6, 5, 2, 2, 1].
-          End scores = (11, 6)
+          Start scores = (69, 75).
+          Player 0 rolls 6 dice and gets outcomes [5, 3, 4, 1, 5, 6].
+          End scores = (70, 75)
           >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=68629, score0=17, score1=25, goal=47, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (17, 25).
-          Player 0 rolls 4 dice and gets outcomes [2, 6, 2, 1].
-          End scores = (18, 25)
-          >>> print(turns[1])
-          Start scores = (18, 25).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (18, 40)
-          >>> print(turns[2])
-          Start scores = (18, 40).
-          Player 0 rolls 9 dice and gets outcomes [3, 3, 1, 1, 1, 5, 5, 3, 1].
-          End scores = (19, 40)
-          >>> print(turns[3])
-          Start scores = (19, 40).
-          Player 1 rolls 8 dice and gets outcomes [6, 6, 2, 1, 3, 6, 2, 2].
-          End scores = (19, 41)
+          Start scores = (70, 75).
+          Player 1 rolls 6 dice and gets outcomes [6, 4, 6, 1, 5, 3].
+          End scores = (70, 76)
           >>> print(turns[4])
-          Start scores = (19, 41).
-          Player 0 rolls 7 dice and gets outcomes [1, 4, 3, 3, 2, 6, 5].
-          End scores = (20, 41)
+          Start scores = (70, 76).
+          Player 0 rolls 7 dice and gets outcomes [2, 2, 1, 3, 3, 6, 1].
+          End scores = (71, 76)
           >>> print(turns[5])
-          Start scores = (20, 41).
-          Player 1 rolls 4 dice and gets outcomes [6, 3, 6, 6].
-          End scores = (20, 62)
+          Start scores = (71, 76).
+          Player 1 rolls 7 dice and gets outcomes [6, 3, 6, 4, 5, 3, 1].
+          End scores = (71, 77)
           >>> print(turns[6])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=1568, score0=3, score1=29, goal=51, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (3, 29).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (7, 29)
-          >>> print(turns[1])
-          Start scores = (7, 29).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (7, 44)
-          >>> print(turns[2])
-          Start scores = (7, 44).
-          Player 0 rolls 9 dice and gets outcomes [4, 1, 4, 6, 3, 2, 6, 3, 6].
-          End scores = (8, 44)
-          >>> print(turns[3])
-          Start scores = (8, 44).
-          Player 1 rolls 1 dice and gets outcomes [2].
-          End scores = (8, 46)
-          >>> print(turns[4])
-          Start scores = (8, 46).
-          Player 0 rolls 9 dice and gets outcomes [3, 4, 1, 4, 5, 2, 3, 6, 1].
-          End scores = (9, 46)
-          >>> print(turns[5])
-          Start scores = (9, 46).
-          Player 1 rolls 8 dice and gets outcomes [2, 3, 6, 1, 6, 1, 4, 3].
-          End scores = (9, 47)
-          >>> print(turns[6])
-          Start scores = (9, 47).
-          Player 0 rolls 4 dice and gets outcomes [3, 3, 1, 5].
-          End scores = (10, 47)
+          Start scores = (71, 77).
+          Player 0 rolls 4 dice and gets outcomes [2, 6, 4, 4].
+          End scores = (87, 77)
           >>> print(turns[7])
-          Start scores = (10, 47).
-          Player 1 rolls 5 dice and gets outcomes [5, 4, 5, 3, 5].
-          End scores = (10, 69)
+          Start scores = (87, 77).
+          Player 1 rolls 5 dice and gets outcomes [2, 6, 3, 3, 4].
+          End scores = (87, 95)
           >>> print(turns[8])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=72434, score0=8, score1=45, goal=67, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (8, 45).
-          Player 0 rolls 8 dice and gets outcomes [6, 1, 6, 6, 6, 3, 5, 4].
-          End scores = (9, 45)
-          >>> print(turns[1])
-          Start scores = (9, 45).
-          Player 1 rolls 4 dice and gets outcomes [3, 3, 4, 4].
-          End scores = (9, 59)
-          >>> print(turns[2])
-          Start scores = (9, 59).
-          Player 0 rolls 9 dice and gets outcomes [3, 2, 5, 5, 1, 6, 4, 3, 3].
-          End scores = (10, 59)
-          >>> print(turns[3])
-          Start scores = (10, 59).
-          Player 1 rolls 5 dice and gets outcomes [5, 6, 6, 6, 5].
-          End scores = (10, 87)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=55979, score0=75, score1=80, goal=95, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (75, 80).
-          Player 0 rolls 4 dice and gets outcomes [4, 1, 6, 4].
-          End scores = (76, 80)
-          >>> print(turns[1])
-          Start scores = (76, 80).
-          Player 1 rolls 4 dice and gets outcomes [3, 1, 1, 3].
-          End scores = (76, 100)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=93729, score0=37, score1=63, goal=83, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (37, 63).
-          Player 0 rolls 8 dice and gets outcomes [3, 1, 1, 4, 5, 5, 1, 5].
-          End scores = (38, 63)
-          >>> print(turns[1])
-          Start scores = (38, 63).
-          Player 1 rolls 6 dice and gets outcomes [2, 5, 1, 3, 3, 5].
-          End scores = (38, 81)
-          >>> print(turns[2])
-          Start scores = (38, 81).
-          Player 0 rolls 8 dice and gets outcomes [3, 3, 6, 5, 3, 3, 3, 3].
-          End scores = (67, 81)
-          >>> print(turns[3])
-          Start scores = (67, 81).
-          Player 1 rolls 8 dice and gets outcomes [5, 3, 2, 5, 6, 3, 6, 2].
-          End scores = (67, 113)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=53739, score0=54, score1=50, goal=58, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (54, 50).
-          Player 0 rolls 9 dice and gets outcomes [4, 3, 5, 6, 3, 2, 3, 4, 2].
-          End scores = (86, 50)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=30305, score0=21, score1=1, goal=55, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (21, 1).
-          Player 0 rolls 6 dice and gets outcomes [1, 6, 5, 2, 2, 5].
-          End scores = (22, 1)
-          >>> print(turns[1])
-          Start scores = (22, 1).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (22, 2)
-          >>> print(turns[2])
-          Start scores = (22, 2).
-          Player 0 rolls 1 dice and gets outcomes [6].
-          End scores = (28, 2)
-          >>> print(turns[3])
-          Start scores = (28, 2).
-          Player 1 rolls 10 dice and gets outcomes [4, 6, 4, 1, 3, 3, 5, 3, 2, 1].
-          End scores = (28, 3)
-          >>> print(turns[4])
-          Start scores = (28, 3).
-          Player 0 rolls 4 dice and gets outcomes [6, 5, 5, 4].
-          End scores = (48, 3)
-          >>> print(turns[5])
-          Start scores = (48, 3).
-          Player 1 rolls 10 dice and gets outcomes [3, 6, 3, 4, 1, 5, 4, 6, 3, 1].
-          End scores = (48, 9)
-          >>> print(turns[6])
-          Start scores = (48, 9).
-          Player 0 rolls 8 dice and gets outcomes [4, 3, 4, 2, 1, 5, 2, 3].
-          End scores = (64, 9)
-          >>> print(turns[7])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=63941, score0=1, score1=44, goal=73, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (1, 44).
-          Player 0 rolls 6 dice and gets outcomes [2, 1, 1, 5, 1, 6].
-          End scores = (2, 44)
-          >>> print(turns[1])
-          Start scores = (2, 44).
-          Player 1 rolls 9 dice and gets outcomes [5, 2, 3, 5, 1, 1, 5, 5, 1].
-          End scores = (2, 45)
-          >>> print(turns[2])
-          Start scores = (2, 45).
-          Player 0 rolls 8 dice and gets outcomes [5, 4, 3, 4, 3, 1, 2, 2].
-          End scores = (3, 45)
-          >>> print(turns[3])
-          Start scores = (3, 45).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (3, 52)
-          >>> print(turns[4])
-          Start scores = (3, 52).
-          Player 0 rolls 5 dice and gets outcomes [2, 6, 5, 5, 2].
-          End scores = (23, 52)
-          >>> print(turns[5])
-          Start scores = (23, 52).
-          Player 1 rolls 7 dice and gets outcomes [2, 3, 2, 1, 4, 3, 6].
-          End scores = (23, 53)
-          >>> print(turns[6])
-          Start scores = (23, 53).
-          Player 0 rolls 2 dice and gets outcomes [6, 4].
-          End scores = (33, 53)
-          >>> print(turns[7])
-          Start scores = (33, 53).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (33, 58)
-          >>> print(turns[8])
-          Start scores = (33, 58).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (40, 58)
-          >>> print(turns[9])
-          Start scores = (40, 58).
-          Player 1 rolls 7 dice and gets outcomes [3, 3, 4, 3, 2, 6, 5].
-          End scores = (40, 84)
-          >>> print(turns[10])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=55351, score0=33, score1=18, goal=69, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (33, 18).
-          Player 0 rolls 7 dice and gets outcomes [5, 2, 1, 2, 3, 5, 1].
-          End scores = (34, 18)
-          >>> print(turns[1])
-          Start scores = (34, 18).
-          Player 1 rolls 10 dice and gets outcomes [4, 4, 2, 2, 2, 2, 2, 5, 6, 2].
-          End scores = (34, 49)
-          >>> print(turns[2])
-          Start scores = (34, 49).
-          Player 0 rolls 1 dice and gets outcomes [2].
-          End scores = (36, 49)
-          >>> print(turns[3])
-          Start scores = (36, 49).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (36, 54)
-          >>> print(turns[4])
-          Start scores = (36, 54).
-          Player 0 rolls 7 dice and gets outcomes [3, 1, 1, 5, 2, 2, 6].
-          End scores = (37, 54)
-          >>> print(turns[5])
-          Start scores = (37, 54).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (37, 63)
-          >>> print(turns[6])
-          Start scores = (37, 63).
-          Player 0 rolls 1 dice and gets outcomes [5].
-          End scores = (42, 63)
-          >>> print(turns[7])
-          Start scores = (42, 63).
-          Player 1 rolls 8 dice and gets outcomes [6, 1, 2, 4, 2, 3, 6, 1].
-          End scores = (42, 64)
-          >>> print(turns[8])
-          Start scores = (42, 64).
-          Player 0 rolls 6 dice and gets outcomes [1, 2, 2, 2, 5, 6].
-          End scores = (43, 64)
-          >>> print(turns[9])
-          Start scores = (43, 64).
-          Player 1 rolls 4 dice and gets outcomes [3, 3, 6, 3].
-          End scores = (43, 79)
-          >>> print(turns[10])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=50979, score0=50, score1=2, goal=56, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (50, 2).
-          Player 0 rolls 5 dice and gets outcomes [6, 2, 3, 4, 5].
-          End scores = (70, 2)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=64647, score0=11, score1=5, goal=33, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (11, 5).
+          Start scores = (87, 95).
           Player 0 rolls 1 dice and gets outcomes [1].
-          End scores = (12, 5)
-          >>> print(turns[1])
-          Start scores = (12, 5).
-          Player 1 rolls 9 dice and gets outcomes [6, 6, 6, 6, 2, 3, 4, 6, 3].
-          End scores = (12, 47)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=87563, score0=63, score1=55, goal=90, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (63, 55).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (64, 55)
-          >>> print(turns[1])
-          Start scores = (64, 55).
-          Player 1 rolls 8 dice and gets outcomes [5, 5, 4, 2, 4, 6, 2, 5].
-          End scores = (64, 88)
-          >>> print(turns[2])
-          Start scores = (64, 88).
-          Player 0 rolls 3 dice and gets outcomes [6, 6, 6].
-          End scores = (82, 88)
-          >>> print(turns[3])
-          Start scores = (82, 88).
-          Player 1 rolls 10 dice and gets outcomes [3, 4, 3, 6, 5, 2, 4, 5, 6, 4].
-          End scores = (82, 130)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=46403, score0=9, score1=12, goal=13, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (9, 12).
-          Player 0 rolls 9 dice and gets outcomes [4, 6, 3, 2, 3, 2, 6, 4, 1].
-          End scores = (10, 12)
-          >>> print(turns[1])
-          Start scores = (10, 12).
-          Player 1 rolls 7 dice and gets outcomes [1, 1, 6, 3, 4, 3, 3].
-          End scores = (10, 13)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=77217, score0=2, score1=39, goal=83, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (2, 39).
-          Player 0 rolls 3 dice and gets outcomes [6, 4, 6].
-          End scores = (18, 39)
-          >>> print(turns[1])
-          Start scores = (18, 39).
-          Player 1 rolls 10 dice and gets outcomes [4, 4, 5, 1, 2, 3, 3, 5, 6, 3].
-          End scores = (18, 40)
-          >>> print(turns[2])
-          Start scores = (18, 40).
-          Player 0 rolls 9 dice and gets outcomes [3, 6, 6, 3, 3, 2, 2, 5, 5].
-          End scores = (53, 40)
-          >>> print(turns[3])
-          Start scores = (53, 40).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (53, 45)
-          >>> print(turns[4])
-          Start scores = (53, 45).
-          Player 0 rolls 3 dice and gets outcomes [4, 3, 4].
-          End scores = (81, 45)
-          >>> print(turns[5])
-          Start scores = (81, 45).
-          Player 1 rolls 9 dice and gets outcomes [4, 6, 6, 6, 1, 1, 6, 6, 5].
-          End scores = (81, 46)
-          >>> print(turns[6])
-          Start scores = (81, 46).
-          Player 0 rolls 2 dice and gets outcomes [3, 3].
-          End scores = (87, 46)
-          >>> print(turns[7])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=32342, score0=1, score1=1, goal=15, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (1, 1).
-          Player 0 rolls 5 dice and gets outcomes [5, 4, 1, 6, 1].
-          End scores = (2, 1)
-          >>> print(turns[1])
-          Start scores = (2, 1).
-          Player 1 rolls 1 dice and gets outcomes [6].
-          End scores = (2, 7)
-          >>> print(turns[2])
-          Start scores = (2, 7).
-          Player 0 rolls 8 dice and gets outcomes [5, 3, 4, 6, 4, 3, 1, 1].
-          End scores = (3, 7)
-          >>> print(turns[3])
-          Start scores = (3, 7).
-          Player 1 rolls 6 dice and gets outcomes [1, 4, 1, 6, 6, 6].
-          End scores = (3, 8)
-          >>> print(turns[4])
-          Start scores = (3, 8).
-          Player 0 rolls 7 dice and gets outcomes [5, 3, 3, 6, 5, 5, 3].
-          End scores = (33, 8)
-          >>> print(turns[5])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=81605, score0=73, score1=74, goal=91, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (73, 74).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (77, 74)
-          >>> print(turns[1])
-          Start scores = (77, 74).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (77, 75)
-          >>> print(turns[2])
-          Start scores = (77, 75).
-          Player 0 rolls 5 dice and gets outcomes [3, 4, 5, 2, 6].
-          End scores = (97, 75)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=25561, score0=69, score1=44, goal=89, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (69, 44).
-          Player 0 rolls 4 dice and gets outcomes [5, 6, 3, 1].
-          End scores = (70, 44)
-          >>> print(turns[1])
-          Start scores = (70, 44).
-          Player 1 rolls 3 dice and gets outcomes [3, 4, 1].
-          End scores = (70, 45)
-          >>> print(turns[2])
-          Start scores = (70, 45).
-          Player 0 rolls 9 dice and gets outcomes [6, 2, 3, 4, 5, 1, 3, 1, 3].
-          End scores = (71, 45)
-          >>> print(turns[3])
-          Start scores = (71, 45).
-          Player 1 rolls 10 dice and gets outcomes [4, 2, 6, 4, 4, 5, 1, 5, 1, 1].
-          End scores = (71, 46)
-          >>> print(turns[4])
-          Start scores = (71, 46).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (76, 46)
-          >>> print(turns[5])
-          Start scores = (76, 46).
-          Player 1 rolls 3 dice and gets outcomes [3, 2, 6].
-          End scores = (76, 57)
-          >>> print(turns[6])
-          Start scores = (76, 57).
-          Player 0 rolls 6 dice and gets outcomes [3, 5, 1, 1, 2, 4].
-          End scores = (77, 57)
-          >>> print(turns[7])
-          Start scores = (77, 57).
-          Player 1 rolls 2 dice and gets outcomes [4, 6].
-          End scores = (77, 67)
-          >>> print(turns[8])
-          Start scores = (77, 67).
-          Player 0 rolls 1 dice and gets outcomes [6].
-          End scores = (83, 67)
+          End scores = (88, 95)
           >>> print(turns[9])
-          Start scores = (83, 67).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (83, 78)
-          >>> print(turns[10])
-          Start scores = (83, 78).
-          Player 0 rolls 4 dice and gets outcomes [6, 5, 1, 5].
-          End scores = (84, 78)
-          >>> print(turns[11])
-          Start scores = (84, 78).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (84, 87)
-          >>> print(turns[12])
-          Start scores = (84, 87).
-          Player 0 rolls 2 dice and gets outcomes [3, 4].
-          End scores = (91, 87)
-          >>> print(turns[13])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=599, score0=3, score1=0, goal=14, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (3, 0).
-          Player 0 rolls 7 dice and gets outcomes [2, 3, 2, 4, 1, 2, 6].
-          End scores = (9, 0)
-          >>> print(turns[1])
-          Start scores = (9, 0).
-          Player 1 rolls 4 dice and gets outcomes [3, 4, 5, 2].
-          End scores = (9, 14)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=59603, score0=27, score1=58, goal=90, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (27, 58).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (34, 58)
-          >>> print(turns[1])
-          Start scores = (34, 58).
-          Player 1 rolls 5 dice and gets outcomes [2, 1, 2, 1, 6].
-          End scores = (34, 59)
-          >>> print(turns[2])
-          Start scores = (34, 59).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (38, 59)
-          >>> print(turns[3])
-          Start scores = (38, 59).
-          Player 1 rolls 6 dice and gets outcomes [2, 1, 6, 5, 5, 5].
-          End scores = (38, 60)
-          >>> print(turns[4])
-          Start scores = (38, 60).
-          Player 0 rolls 6 dice and gets outcomes [3, 4, 2, 4, 1, 4].
-          End scores = (39, 60)
-          >>> print(turns[5])
-          Start scores = (39, 60).
-          Player 1 rolls 2 dice and gets outcomes [3, 5].
-          End scores = (39, 68)
-          >>> print(turns[6])
-          Start scores = (39, 68).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (44, 68)
-          >>> print(turns[7])
-          Start scores = (44, 68).
-          Player 1 rolls 3 dice and gets outcomes [3, 2, 5].
-          End scores = (44, 78)
-          >>> print(turns[8])
-          Start scores = (44, 78).
-          Player 0 rolls 4 dice and gets outcomes [2, 5, 2, 5].
-          End scores = (58, 78)
-          >>> print(turns[9])
-          Start scores = (58, 78).
-          Player 1 rolls 2 dice and gets outcomes [1, 5].
-          End scores = (58, 79)
-          >>> print(turns[10])
-          Start scores = (58, 79).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (63, 79)
-          >>> print(turns[11])
-          Start scores = (63, 79).
-          Player 1 rolls 5 dice and gets outcomes [1, 1, 1, 6, 1].
-          End scores = (63, 80)
-          >>> print(turns[12])
-          Start scores = (63, 80).
-          Player 0 rolls 7 dice and gets outcomes [3, 4, 1, 5, 6, 2, 6].
-          End scores = (64, 80)
-          >>> print(turns[13])
-          Start scores = (64, 80).
-          Player 1 rolls 2 dice and gets outcomes [3, 2].
-          End scores = (64, 85)
-          >>> print(turns[14])
-          Start scores = (64, 85).
-          Player 0 rolls 5 dice and gets outcomes [3, 2, 3, 6, 5].
-          End scores = (83, 85)
-          >>> print(turns[15])
-          Start scores = (83, 85).
-          Player 1 rolls 8 dice and gets outcomes [5, 6, 1, 6, 4, 1, 1, 4].
-          End scores = (83, 86)
-          >>> print(turns[16])
-          Start scores = (83, 86).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (88, 86)
-          >>> print(turns[17])
-          Start scores = (88, 86).
-          Player 1 rolls 2 dice and gets outcomes [2, 4].
-          End scores = (88, 92)
-          >>> print(turns[18])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=29427, score0=18, score1=35, goal=56, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (18, 35).
-          Player 0 rolls 7 dice and gets outcomes [6, 4, 3, 1, 5, 5, 4].
-          End scores = (19, 35)
-          >>> print(turns[1])
-          Start scores = (19, 35).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (19, 52)
-          >>> print(turns[2])
-          Start scores = (19, 52).
-          Player 0 rolls 3 dice and gets outcomes [1, 5, 3].
-          End scores = (20, 52)
-          >>> print(turns[3])
-          Start scores = (20, 52).
-          Player 1 rolls 3 dice and gets outcomes [1, 6, 4].
-          End scores = (20, 53)
-          >>> print(turns[4])
-          Start scores = (20, 53).
-          Player 0 rolls 8 dice and gets outcomes [6, 6, 1, 6, 4, 5, 5, 3].
-          End scores = (21, 53)
-          >>> print(turns[5])
-          Start scores = (21, 53).
-          Player 1 rolls 3 dice and gets outcomes [6, 2, 2].
-          End scores = (21, 63)
-          >>> print(turns[6])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=90865, score0=9, score1=18, goal=35, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (9, 18).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (24, 18)
-          >>> print(turns[1])
-          Start scores = (24, 18).
-          Player 1 rolls 9 dice and gets outcomes [3, 1, 5, 6, 3, 1, 3, 1, 4].
-          End scores = (24, 19)
-          >>> print(turns[2])
-          Start scores = (24, 19).
-          Player 0 rolls 8 dice and gets outcomes [3, 1, 4, 6, 1, 3, 5, 6].
-          End scores = (25, 19)
-          >>> print(turns[3])
-          Start scores = (25, 19).
-          Player 1 rolls 5 dice and gets outcomes [3, 4, 3, 2, 2].
-          End scores = (25, 33)
-          >>> print(turns[4])
-          Start scores = (25, 33).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (26, 33)
-          >>> print(turns[5])
-          Start scores = (26, 33).
-          Player 1 rolls 8 dice and gets outcomes [1, 2, 1, 3, 6, 3, 6, 3].
-          End scores = (26, 34)
-          >>> print(turns[6])
-          Start scores = (26, 34).
-          Player 0 rolls 9 dice and gets outcomes [6, 3, 6, 1, 3, 1, 6, 5, 3].
-          End scores = (27, 34)
-          >>> print(turns[7])
-          Start scores = (27, 34).
-          Player 1 rolls 3 dice and gets outcomes [3, 6, 5].
-          End scores = (27, 48)
-          >>> print(turns[8])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=27412, score0=3, score1=10, goal=22, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (3, 10).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (6, 10)
-          >>> print(turns[1])
-          Start scores = (6, 10).
-          Player 1 rolls 10 dice and gets outcomes [6, 3, 3, 4, 2, 2, 6, 4, 6, 2].
-          End scores = (6, 48)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=64099, score0=14, score1=44, goal=46, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (14, 44).
-          Player 0 rolls 10 dice and gets outcomes [2, 2, 2, 4, 4, 2, 1, 3, 2, 6].
-          End scores = (15, 44)
-          >>> print(turns[1])
-          Start scores = (15, 44).
-          Player 1 rolls 8 dice and gets outcomes [6, 4, 2, 2, 4, 1, 2, 6].
-          End scores = (15, 45)
-          >>> print(turns[2])
-          Start scores = (15, 45).
-          Player 0 rolls 6 dice and gets outcomes [5, 6, 2, 6, 2, 5].
-          End scores = (41, 45)
-          >>> print(turns[3])
-          Start scores = (41, 45).
-          Player 1 rolls 8 dice and gets outcomes [1, 5, 3, 3, 4, 6, 6, 1].
-          End scores = (41, 46)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=99115, score0=30, score1=22, goal=34, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (30, 22).
-          Player 0 rolls 6 dice and gets outcomes [5, 5, 6, 4, 4, 4].
-          End scores = (58, 22)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=41138, score0=84, score1=25, goal=92, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (84, 25).
-          Player 0 rolls 4 dice and gets outcomes [1, 5, 2, 5].
-          End scores = (85, 25)
-          >>> print(turns[1])
-          Start scores = (85, 25).
-          Player 1 rolls 5 dice and gets outcomes [2, 4, 2, 6, 5].
-          End scores = (85, 44)
-          >>> print(turns[2])
-          Start scores = (85, 44).
-          Player 0 rolls 5 dice and gets outcomes [2, 4, 3, 6, 5].
-          End scores = (105, 44)
-          >>> print(turns[3])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=75946, score0=76, score1=58, goal=91, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (76, 58).
-          Player 0 rolls 9 dice and gets outcomes [2, 4, 1, 3, 4, 6, 6, 3, 4].
-          End scores = (77, 58)
-          >>> print(turns[1])
-          Start scores = (77, 58).
-          Player 1 rolls 3 dice and gets outcomes [4, 6, 6].
-          End scores = (77, 74)
-          >>> print(turns[2])
-          Start scores = (77, 74).
-          Player 0 rolls 9 dice and gets outcomes [6, 1, 3, 3, 6, 3, 6, 4, 1].
-          End scores = (78, 74)
-          >>> print(turns[3])
-          Start scores = (78, 74).
-          Player 1 rolls 4 dice and gets outcomes [5, 3, 4, 1].
-          End scores = (78, 75)
-          >>> print(turns[4])
-          Start scores = (78, 75).
-          Player 0 rolls 2 dice and gets outcomes [5, 2].
-          End scores = (85, 75)
-          >>> print(turns[5])
-          Start scores = (85, 75).
-          Player 1 rolls 3 dice and gets outcomes [3, 3, 4].
-          End scores = (85, 85)
-          >>> print(turns[6])
-          Start scores = (85, 85).
-          Player 0 rolls 7 dice and gets outcomes [1, 3, 1, 5, 2, 4, 5].
-          End scores = (86, 85)
-          >>> print(turns[7])
-          Start scores = (86, 85).
-          Player 1 rolls 4 dice and gets outcomes [5, 6, 5, 6].
-          End scores = (86, 107)
-          >>> print(turns[8])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=29276, score0=44, score1=6, goal=85, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (44, 6).
-          Player 0 rolls 3 dice and gets outcomes [3, 1, 6].
-          End scores = (45, 6)
-          >>> print(turns[1])
-          Start scores = (45, 6).
-          Player 1 rolls 2 dice and gets outcomes [1, 4].
-          End scores = (45, 7)
-          >>> print(turns[2])
-          Start scores = (45, 7).
-          Player 0 rolls 6 dice and gets outcomes [4, 2, 5, 4, 1, 5].
-          End scores = (46, 7)
-          >>> print(turns[3])
-          Start scores = (46, 7).
-          Player 1 rolls 4 dice and gets outcomes [1, 1, 3, 3].
-          End scores = (46, 8)
-          >>> print(turns[4])
-          Start scores = (46, 8).
-          Player 0 rolls 9 dice and gets outcomes [6, 4, 1, 1, 3, 1, 4, 5, 5].
-          End scores = (47, 8)
-          >>> print(turns[5])
-          Start scores = (47, 8).
-          Player 1 rolls 8 dice and gets outcomes [3, 5, 5, 3, 2, 5, 1, 4].
-          End scores = (47, 9)
-          >>> print(turns[6])
-          Start scores = (47, 9).
-          Player 0 rolls 10 dice and gets outcomes [6, 5, 2, 5, 2, 5, 3, 1, 5, 1].
-          End scores = (48, 9)
-          >>> print(turns[7])
-          Start scores = (48, 9).
-          Player 1 rolls 10 dice and gets outcomes [2, 1, 3, 1, 1, 4, 5, 4, 1, 6].
-          End scores = (48, 10)
-          >>> print(turns[8])
-          Start scores = (48, 10).
-          Player 0 rolls 5 dice and gets outcomes [2, 5, 4, 4, 4].
-          End scores = (67, 10)
-          >>> print(turns[9])
-          Start scores = (67, 10).
-          Player 1 rolls 2 dice and gets outcomes [5, 3].
-          End scores = (67, 18)
-          >>> print(turns[10])
-          Start scores = (67, 18).
-          Player 0 rolls 3 dice and gets outcomes [2, 5, 4].
-          End scores = (78, 18)
-          >>> print(turns[11])
-          Start scores = (78, 18).
-          Player 1 rolls 3 dice and gets outcomes [2, 2, 6].
-          End scores = (78, 28)
-          >>> print(turns[12])
-          Start scores = (78, 28).
-          Player 0 rolls 4 dice and gets outcomes [6, 6, 4, 4].
-          End scores = (98, 28)
-          >>> print(turns[13])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=5971, score0=31, score1=81, goal=100, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (31, 81).
-          Player 0 rolls 6 dice and gets outcomes [4, 1, 4, 5, 3, 4].
-          End scores = (32, 81)
-          >>> print(turns[1])
-          Start scores = (32, 81).
-          Player 1 rolls 2 dice and gets outcomes [2, 4].
-          End scores = (32, 87)
-          >>> print(turns[2])
-          Start scores = (32, 87).
-          Player 0 rolls 5 dice and gets outcomes [4, 6, 1, 2, 4].
-          End scores = (33, 87)
-          >>> print(turns[3])
-          Start scores = (33, 87).
-          Player 1 rolls 9 dice and gets outcomes [2, 5, 2, 3, 1, 5, 2, 3, 2].
-          End scores = (33, 88)
-          >>> print(turns[4])
-          Start scores = (33, 88).
-          Player 0 rolls 7 dice and gets outcomes [4, 4, 4, 3, 4, 4, 2].
-          End scores = (58, 88)
-          >>> print(turns[5])
-          Start scores = (58, 88).
-          Player 1 rolls 8 dice and gets outcomes [1, 1, 2, 6, 1, 1, 3, 6].
-          End scores = (58, 89)
-          >>> print(turns[6])
-          Start scores = (58, 89).
-          Player 0 rolls 7 dice and gets outcomes [5, 5, 5, 6, 1, 6, 5].
-          End scores = (59, 89)
-          >>> print(turns[7])
-          Start scores = (59, 89).
-          Player 1 rolls 2 dice and gets outcomes [1, 3].
-          End scores = (59, 90)
-          >>> print(turns[8])
-          Start scores = (59, 90).
-          Player 0 rolls 6 dice and gets outcomes [1, 4, 3, 4, 1, 5].
-          End scores = (60, 90)
-          >>> print(turns[9])
-          Start scores = (60, 90).
-          Player 1 rolls 5 dice and gets outcomes [6, 6, 2, 4, 3].
-          End scores = (60, 111)
+          Start scores = (88, 95).
+          Player 1 rolls 6 dice and gets outcomes [2, 4, 2, 2, 6, 4].
+          End scores = (88, 115)
           >>> print(turns[10])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=88253, score0=4, score1=10, goal=37, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=8714, score0=38, score1=19, goal=57)
           >>> print(turns[0])
-          Start scores = (4, 10).
-          Player 0 rolls 6 dice and gets outcomes [1, 4, 4, 2, 4, 2].
-          End scores = (5, 10)
-          >>> print(turns[1])
-          Start scores = (5, 10).
-          Player 1 rolls 3 dice and gets outcomes [4, 3, 4].
-          End scores = (5, 21)
-          >>> print(turns[2])
-          Start scores = (5, 21).
+          Start scores = (38, 19).
           Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (8, 21)
+          End scores = (45, 19)
+          >>> print(turns[1])
+          Start scores = (45, 19).
+          Player 1 rolls 9 dice and gets outcomes [5, 1, 1, 1, 4, 5, 5, 4, 6].
+          End scores = (45, 20)
+          >>> print(turns[2])
+          Start scores = (45, 20).
+          Player 0 rolls 8 dice and gets outcomes [5, 6, 3, 4, 3, 5, 1, 5].
+          End scores = (46, 20)
           >>> print(turns[3])
-          Start scores = (8, 21).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (8, 26)
+          Start scores = (46, 20).
+          Player 1 rolls 4 dice and gets outcomes [4, 2, 5, 5].
+          End scores = (46, 36)
           >>> print(turns[4])
-          Start scores = (8, 26).
-          Player 0 rolls 2 dice and gets outcomes [2, 3].
-          End scores = (13, 26)
+          Start scores = (46, 36).
+          Player 0 rolls 8 dice and gets outcomes [5, 4, 2, 1, 5, 4, 3, 6].
+          End scores = (47, 36)
           >>> print(turns[5])
-          Start scores = (13, 26).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (13, 31)
+          Start scores = (47, 36).
+          Player 1 rolls 6 dice and gets outcomes [1, 5, 1, 3, 3, 4].
+          End scores = (47, 37)
           >>> print(turns[6])
-          Start scores = (13, 31).
-          Player 0 rolls 10 dice and gets outcomes [5, 5, 3, 1, 5, 3, 1, 5, 4, 1].
-          End scores = (14, 31)
+          Start scores = (47, 37).
+          Player 0 rolls 7 dice and gets outcomes [6, 5, 4, 2, 6, 4, 6].
+          End scores = (80, 37)
           >>> print(turns[7])
-          Start scores = (14, 31).
-          Player 1 rolls 1 dice and gets outcomes [5].
-          End scores = (14, 49)
-          >>> print(turns[8])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=53592, score0=7, score1=91, goal=96, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=13230, score0=65, score1=56, goal=77)
           >>> print(turns[0])
-          Start scores = (7, 91).
-          Player 0 rolls 2 dice and gets outcomes [1, 5].
-          End scores = (8, 91)
+          Start scores = (65, 56).
+          Player 0 rolls 6 dice and gets outcomes [2, 5, 2, 1, 3, 4].
+          End scores = (66, 56)
           >>> print(turns[1])
-          Start scores = (8, 91).
-          Player 1 rolls 4 dice and gets outcomes [3, 6, 5, 4].
-          End scores = (8, 109)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=61601, score0=39, score1=1, goal=65, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (39, 1).
-          Player 0 rolls 4 dice and gets outcomes [4, 5, 4, 1].
-          End scores = (40, 1)
-          >>> print(turns[1])
-          Start scores = (40, 1).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (40, 10)
-          >>> print(turns[2])
-          Start scores = (40, 10).
-          Player 0 rolls 3 dice and gets outcomes [4, 4, 6].
-          End scores = (54, 10)
-          >>> print(turns[3])
-          Start scores = (54, 10).
-          Player 1 rolls 8 dice and gets outcomes [5, 5, 6, 5, 1, 2, 1, 2].
-          End scores = (54, 11)
-          >>> print(turns[4])
-          Start scores = (54, 11).
-          Player 0 rolls 5 dice and gets outcomes [6, 2, 4, 2, 3].
-          End scores = (71, 11)
-          >>> print(turns[5])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=61473, score0=14, score1=16, goal=55, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (14, 16).
-          Player 0 rolls 3 dice and gets outcomes [3, 4, 1].
-          End scores = (15, 16)
-          >>> print(turns[1])
-          Start scores = (15, 16).
-          Player 1 rolls 2 dice and gets outcomes [3, 1].
-          End scores = (15, 17)
-          >>> print(turns[2])
-          Start scores = (15, 17).
-          Player 0 rolls 8 dice and gets outcomes [6, 5, 6, 2, 2, 2, 1, 3].
-          End scores = (25, 17)
-          >>> print(turns[3])
-          Start scores = (25, 17).
-          Player 1 rolls 2 dice and gets outcomes [1, 2].
-          End scores = (25, 18)
-          >>> print(turns[4])
-          Start scores = (25, 18).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (29, 18)
-          >>> print(turns[5])
-          Start scores = (29, 18).
-          Player 1 rolls 10 dice and gets outcomes [2, 2, 4, 5, 1, 6, 4, 5, 5, 3].
-          End scores = (29, 19)
-          >>> print(turns[6])
-          Start scores = (29, 19).
-          Player 0 rolls 10 dice and gets outcomes [5, 1, 6, 2, 6, 2, 4, 1, 4, 2].
-          End scores = (30, 19)
-          >>> print(turns[7])
-          Start scores = (30, 19).
-          Player 1 rolls 4 dice and gets outcomes [2, 6, 2, 1].
-          End scores = (30, 20)
-          >>> print(turns[8])
-          Start scores = (30, 20).
-          Player 0 rolls 5 dice and gets outcomes [3, 3, 6, 2, 5].
-          End scores = (64, 20)
-          >>> print(turns[9])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=64089, score0=31, score1=87, goal=88, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (31, 87).
-          Player 0 rolls 2 dice and gets outcomes [4, 1].
-          End scores = (32, 87)
-          >>> print(turns[1])
-          Start scores = (32, 87).
-          Player 1 rolls 10 dice and gets outcomes [3, 1, 4, 1, 4, 3, 2, 4, 6, 4].
-          End scores = (32, 88)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=61086, score0=7, score1=17, goal=18, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (7, 17).
-          Player 0 rolls 9 dice and gets outcomes [4, 1, 6, 6, 1, 3, 5, 1, 4].
-          End scores = (8, 17)
-          >>> print(turns[1])
-          Start scores = (8, 17).
-          Player 1 rolls 3 dice and gets outcomes [1, 1, 5].
-          End scores = (8, 18)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=51837, score0=8, score1=14, goal=17, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (8, 14).
-          Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (15, 14)
-          >>> print(turns[1])
-          Start scores = (15, 14).
-          Player 1 rolls 3 dice and gets outcomes [3, 4, 4].
-          End scores = (15, 25)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=42021, score0=2, score1=17, goal=79, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (2, 17).
-          Player 0 rolls 5 dice and gets outcomes [6, 2, 4, 2, 6].
-          End scores = (22, 17)
-          >>> print(turns[1])
-          Start scores = (22, 17).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (22, 18)
-          >>> print(turns[2])
-          Start scores = (22, 18).
-          Player 0 rolls 2 dice and gets outcomes [6, 3].
-          End scores = (31, 18)
-          >>> print(turns[3])
-          Start scores = (31, 18).
+          Start scores = (66, 56).
           Player 1 rolls 2 dice and gets outcomes [2, 5].
-          End scores = (31, 25)
+          End scores = (66, 63)
+          >>> print(turns[2])
+          Start scores = (66, 63).
+          Player 0 rolls 3 dice and gets outcomes [4, 1, 1].
+          End scores = (67, 63)
+          >>> print(turns[3])
+          Start scores = (67, 63).
+          Player 1 rolls 3 dice and gets outcomes [5, 3, 6].
+          End scores = (67, 77)
           >>> print(turns[4])
-          Start scores = (31, 25).
-          Player 0 rolls 7 dice and gets outcomes [2, 4, 4, 2, 6, 2, 6].
-          End scores = (57, 25)
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=96667, score0=2, score1=3, goal=13)
+          >>> print(turns[0])
+          Start scores = (2, 3).
+          Player 0 rolls 9 dice and gets outcomes [1, 1, 3, 5, 3, 6, 6, 4, 1].
+          End scores = (3, 3)
+          >>> print(turns[1])
+          Start scores = (3, 3).
+          Player 1 rolls 3 dice and gets outcomes [2, 3, 5].
+          End scores = (3, 13)
+          >>> print(turns[2])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=27904, score0=23, score1=39, goal=92)
+          >>> print(turns[0])
+          Start scores = (23, 39).
+          Player 0 rolls 9 dice and gets outcomes [6, 6, 2, 6, 1, 4, 3, 4, 3].
+          End scores = (24, 39)
+          >>> print(turns[1])
+          Start scores = (24, 39).
+          Player 1 rolls 1 dice and gets outcomes [4].
+          End scores = (24, 43)
+          >>> print(turns[2])
+          Start scores = (24, 43).
+          Player 0 rolls 2 dice and gets outcomes [3, 3].
+          End scores = (30, 43)
+          >>> print(turns[3])
+          Start scores = (30, 43).
+          Player 1 rolls 9 dice and gets outcomes [4, 5, 5, 6, 2, 4, 1, 3, 5].
+          End scores = (30, 44)
+          >>> print(turns[4])
+          Start scores = (30, 44).
+          Player 0 rolls 7 dice and gets outcomes [4, 5, 2, 2, 4, 1, 1].
+          End scores = (31, 44)
           >>> print(turns[5])
-          Start scores = (57, 25).
-          Player 1 rolls 3 dice and gets outcomes [1, 1, 4].
-          End scores = (57, 26)
+          Start scores = (31, 44).
+          Player 1 rolls 7 dice and gets outcomes [5, 5, 6, 1, 6, 1, 1].
+          End scores = (31, 45)
           >>> print(turns[6])
-          Start scores = (57, 26).
-          Player 0 rolls 2 dice and gets outcomes [1, 2].
-          End scores = (58, 26)
+          Start scores = (31, 45).
+          Player 0 rolls 1 dice and gets outcomes [2].
+          End scores = (33, 45)
           >>> print(turns[7])
-          Start scores = (58, 26).
-          Player 1 rolls 3 dice and gets outcomes [6, 1, 5].
-          End scores = (58, 27)
+          Start scores = (33, 45).
+          Player 1 rolls 9 dice and gets outcomes [5, 2, 2, 5, 2, 6, 6, 2, 3].
+          End scores = (33, 78)
           >>> print(turns[8])
-          Start scores = (58, 27).
-          Player 0 rolls 5 dice and gets outcomes [5, 6, 6, 2, 3].
-          End scores = (80, 27)
+          Start scores = (33, 78).
+          Player 0 rolls 10 dice and gets outcomes [5, 3, 4, 5, 2, 1, 5, 5, 3, 6].
+          End scores = (34, 78)
           >>> print(turns[9])
+          Start scores = (34, 78).
+          Player 1 rolls 9 dice and gets outcomes [6, 2, 2, 6, 1, 1, 6, 5, 2].
+          End scores = (34, 79)
+          >>> print(turns[10])
+          Start scores = (34, 79).
+          Player 0 rolls 7 dice and gets outcomes [3, 2, 2, 2, 4, 4, 6].
+          End scores = (57, 79)
+          >>> print(turns[11])
+          Start scores = (57, 79).
+          Player 1 rolls 1 dice and gets outcomes [1].
+          End scores = (57, 80)
+          >>> print(turns[12])
+          Start scores = (57, 80).
+          Player 0 rolls 9 dice and gets outcomes [5, 4, 6, 5, 5, 4, 6, 5, 2].
+          End scores = (99, 80)
+          >>> print(turns[13])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=62911, score0=5, score1=32, goal=50, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=36152, score0=49, score1=25, goal=52)
           >>> print(turns[0])
-          Start scores = (5, 32).
-          Player 0 rolls 8 dice and gets outcomes [3, 5, 5, 4, 3, 1, 2, 3].
-          End scores = (6, 32)
+          Start scores = (49, 25).
+          Player 0 rolls 5 dice and gets outcomes [1, 5, 6, 1, 3].
+          End scores = (50, 25)
           >>> print(turns[1])
-          Start scores = (6, 32).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (6, 45)
+          Start scores = (50, 25).
+          Player 0 rolls 10 dice and gets outcomes [3, 1, 2, 2, 2, 2, 3, 1, 5, 5].
+          End scores = (51, 25)
           >>> print(turns[2])
-          Start scores = (6, 45).
-          Player 0 rolls 7 dice and gets outcomes [5, 2, 1, 1, 2, 2, 4].
-          End scores = (7, 45)
+          Start scores = (51, 25).
+          Player 1 rolls 4 dice and gets outcomes [3, 2, 2, 3].
+          End scores = (51, 35)
           >>> print(turns[3])
-          Start scores = (7, 45).
-          Player 1 rolls 6 dice and gets outcomes [1, 2, 4, 3, 3, 2].
-          End scores = (7, 46)
+          Start scores = (51, 35).
+          Player 0 rolls 8 dice and gets outcomes [1, 5, 3, 2, 2, 4, 3, 5].
+          End scores = (52, 35)
           >>> print(turns[4])
-          Start scores = (7, 46).
-          Player 0 rolls 10 dice and gets outcomes [6, 6, 6, 1, 5, 3, 2, 2, 2, 4].
-          End scores = (8, 46)
-          >>> print(turns[5])
-          Start scores = (8, 46).
-          Player 1 rolls 10 dice and gets outcomes [1, 6, 6, 1, 2, 2, 6, 6, 4, 1].
-          End scores = (8, 47)
-          >>> print(turns[6])
-          Start scores = (8, 47).
-          Player 0 rolls 4 dice and gets outcomes [4, 3, 6, 1].
-          End scores = (16, 47)
-          >>> print(turns[7])
-          Start scores = (16, 47).
-          Player 1 rolls 4 dice and gets outcomes [6, 6, 6, 3].
-          End scores = (16, 68)
-          >>> print(turns[8])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=48409, score0=22, score1=10, goal=61, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=97165, score0=13, score1=4, goal=42)
           >>> print(turns[0])
-          Start scores = (22, 10).
-          Player 0 rolls 8 dice and gets outcomes [6, 1, 3, 3, 3, 2, 2, 6].
-          End scores = (23, 10)
+          Start scores = (13, 4).
+          Player 0 rolls 4 dice and gets outcomes [1, 3, 1, 4].
+          End scores = (14, 4)
           >>> print(turns[1])
-          Start scores = (23, 10).
-          Player 1 rolls 5 dice and gets outcomes [6, 4, 6, 6, 2].
-          End scores = (23, 34)
+          Start scores = (14, 4).
+          Player 1 rolls 6 dice and gets outcomes [5, 4, 5, 3, 3, 5].
+          End scores = (14, 29)
           >>> print(turns[2])
-          Start scores = (23, 34).
-          Player 0 rolls 1 dice and gets outcomes [3].
-          End scores = (26, 34)
+          Start scores = (14, 29).
+          Player 0 rolls 7 dice and gets outcomes [4, 6, 1, 2, 4, 1, 5].
+          End scores = (15, 29)
           >>> print(turns[3])
-          Start scores = (26, 34).
-          Player 1 rolls 1 dice and gets outcomes [2].
-          End scores = (26, 49)
+          Start scores = (15, 29).
+          Player 1 rolls 8 dice and gets outcomes [5, 6, 1, 1, 3, 3, 3, 6].
+          End scores = (15, 30)
           >>> print(turns[4])
-          Start scores = (26, 49).
-          Player 0 rolls 5 dice and gets outcomes [2, 1, 5, 1, 6].
-          End scores = (27, 49)
+          Start scores = (15, 30).
+          Player 1 rolls 7 dice and gets outcomes [3, 4, 4, 5, 2, 6, 4].
+          End scores = (15, 58)
           >>> print(turns[5])
-          Start scores = (27, 49).
-          Player 1 rolls 1 dice and gets outcomes [3].
-          End scores = (27, 52)
-          >>> print(turns[6])
-          Start scores = (27, 52).
-          Player 0 rolls 8 dice and gets outcomes [3, 5, 1, 4, 1, 3, 2, 4].
-          End scores = (28, 52)
-          >>> print(turns[7])
-          Start scores = (28, 52).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (28, 65)
-          >>> print(turns[8])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=50497, score0=8, score1=17, goal=19, update=hog.simple_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=7964, score0=0, score1=12, goal=30)
           >>> print(turns[0])
-          Start scores = (8, 17).
-          Player 0 rolls 8 dice and gets outcomes [3, 3, 1, 2, 5, 2, 4, 5].
-          End scores = (9, 17)
-          >>> print(turns[1])
-          Start scores = (9, 17).
-          Player 1 rolls 0 dice and gets outcomes [].
-          End scores = (9, 36)
-          >>> print(turns[2])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=52997, score0=15, score1=17, goal=23, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (15, 17).
+          Start scores = (0, 12).
           Player 0 rolls 0 dice and gets outcomes [].
-          End scores = (28, 17)
+          End scores = (12, 12)
+          >>> print(turns[1])
+          Start scores = (12, 12).
+          Player 0 rolls 3 dice and gets outcomes [2, 5, 5].
+          End scores = (24, 12)
+          >>> print(turns[2])
+          Start scores = (24, 12).
+          Player 0 rolls 2 dice and gets outcomes [4, 6].
+          End scores = (34, 12)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=87291, score0=59, score1=15, goal=87)
+          >>> print(turns[0])
+          Start scores = (59, 15).
+          Player 0 rolls 3 dice and gets outcomes [2, 2, 1].
+          End scores = (60, 15)
+          >>> print(turns[1])
+          Start scores = (60, 15).
+          Player 0 rolls 1 dice and gets outcomes [6].
+          End scores = (66, 15)
+          >>> print(turns[2])
+          Start scores = (66, 15).
+          Player 1 rolls 5 dice and gets outcomes [2, 4, 4, 4, 3].
+          End scores = (66, 32)
+          >>> print(turns[3])
+          Start scores = (66, 32).
+          Player 0 rolls 7 dice and gets outcomes [5, 2, 3, 3, 5, 1, 6].
+          End scores = (67, 32)
+          >>> print(turns[4])
+          Start scores = (67, 32).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (67, 43)
+          >>> print(turns[5])
+          Start scores = (67, 43).
+          Player 0 rolls 10 dice and gets outcomes [6, 2, 3, 4, 6, 2, 5, 6, 3, 2].
+          End scores = (106, 43)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=2481, score0=32, score1=79, goal=98)
+          >>> print(turns[0])
+          Start scores = (32, 79).
+          Player 0 rolls 10 dice and gets outcomes [2, 4, 4, 5, 2, 5, 3, 1, 2, 5].
+          End scores = (33, 79)
+          >>> print(turns[1])
+          Start scores = (33, 79).
+          Player 1 rolls 6 dice and gets outcomes [2, 2, 5, 5, 1, 6].
+          End scores = (33, 80)
+          >>> print(turns[2])
+          Start scores = (33, 80).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (45, 80)
+          >>> print(turns[3])
+          Start scores = (45, 80).
+          Player 1 rolls 1 dice and gets outcomes [3].
+          End scores = (45, 83)
+          >>> print(turns[4])
+          Start scores = (45, 83).
+          Player 0 rolls 3 dice and gets outcomes [1, 2, 4].
+          End scores = (46, 83)
+          >>> print(turns[5])
+          Start scores = (46, 83).
+          Player 1 rolls 5 dice and gets outcomes [6, 2, 2, 3, 6].
+          End scores = (46, 102)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=57878, score0=4, score1=13, goal=29)
+          >>> print(turns[0])
+          Start scores = (4, 13).
+          Player 0 rolls 5 dice and gets outcomes [2, 3, 1, 6, 3].
+          End scores = (5, 13)
+          >>> print(turns[1])
+          Start scores = (5, 13).
+          Player 1 rolls 9 dice and gets outcomes [3, 4, 2, 3, 3, 4, 1, 4, 3].
+          End scores = (5, 14)
+          >>> print(turns[2])
+          Start scores = (5, 14).
+          Player 0 rolls 5 dice and gets outcomes [1, 5, 2, 3, 1].
+          End scores = (6, 14)
+          >>> print(turns[3])
+          Start scores = (6, 14).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (6, 19)
+          >>> print(turns[4])
+          Start scores = (6, 19).
+          Player 0 rolls 10 dice and gets outcomes [5, 1, 3, 6, 6, 1, 1, 6, 4, 5].
+          End scores = (7, 19)
+          >>> print(turns[5])
+          Start scores = (7, 19).
+          Player 1 rolls 5 dice and gets outcomes [3, 4, 4, 2, 2].
+          End scores = (7, 34)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=27303, score0=31, score1=3, goal=39)
+          >>> print(turns[0])
+          Start scores = (31, 3).
+          Player 0 rolls 9 dice and gets outcomes [6, 5, 6, 1, 6, 2, 2, 2, 6].
+          End scores = (32, 3)
+          >>> print(turns[1])
+          Start scores = (32, 3).
+          Player 1 rolls 9 dice and gets outcomes [1, 6, 1, 1, 5, 5, 2, 1, 6].
+          End scores = (32, 4)
+          >>> print(turns[2])
+          Start scores = (32, 4).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (40, 4)
+          >>> print(turns[3])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=98514, score0=46, score1=42, goal=60)
+          >>> print(turns[0])
+          Start scores = (46, 42).
+          Player 0 rolls 5 dice and gets outcomes [5, 1, 3, 3, 5].
+          End scores = (47, 42)
+          >>> print(turns[1])
+          Start scores = (47, 42).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (47, 52)
+          >>> print(turns[2])
+          Start scores = (47, 52).
+          Player 0 rolls 10 dice and gets outcomes [6, 3, 4, 4, 5, 1, 4, 6, 4, 5].
+          End scores = (48, 52)
+          >>> print(turns[3])
+          Start scores = (48, 52).
+          Player 1 rolls 1 dice and gets outcomes [6].
+          End scores = (48, 58)
+          >>> print(turns[4])
+          Start scores = (48, 58).
+          Player 0 rolls 9 dice and gets outcomes [3, 2, 2, 6, 5, 4, 3, 1, 4].
+          End scores = (49, 58)
+          >>> print(turns[5])
+          Start scores = (49, 58).
+          Player 1 rolls 6 dice and gets outcomes [2, 5, 5, 1, 4, 5].
+          End scores = (49, 59)
+          >>> print(turns[6])
+          Start scores = (49, 59).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (56, 59)
+          >>> print(turns[7])
+          Start scores = (56, 59).
+          Player 1 rolls 1 dice and gets outcomes [6].
+          End scores = (56, 65)
+          >>> print(turns[8])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=64395, score0=3, score1=18, goal=52)
+          >>> print(turns[0])
+          Start scores = (3, 18).
+          Player 0 rolls 9 dice and gets outcomes [4, 4, 6, 3, 2, 6, 3, 3, 2].
+          End scores = (36, 18)
+          >>> print(turns[1])
+          Start scores = (36, 18).
+          Player 0 rolls 8 dice and gets outcomes [2, 1, 2, 6, 5, 6, 3, 3].
+          End scores = (37, 18)
+          >>> print(turns[2])
+          Start scores = (37, 18).
+          Player 1 rolls 7 dice and gets outcomes [2, 6, 4, 1, 4, 5, 2].
+          End scores = (37, 19)
+          >>> print(turns[3])
+          Start scores = (37, 19).
+          Player 0 rolls 4 dice and gets outcomes [1, 3, 4, 4].
+          End scores = (38, 19)
+          >>> print(turns[4])
+          Start scores = (38, 19).
+          Player 0 rolls 2 dice and gets outcomes [5, 3].
+          End scores = (46, 19)
+          >>> print(turns[5])
+          Start scores = (46, 19).
+          Player 1 rolls 5 dice and gets outcomes [1, 1, 4, 3, 6].
+          End scores = (46, 20)
+          >>> print(turns[6])
+          Start scores = (46, 20).
+          Player 0 rolls 9 dice and gets outcomes [2, 4, 3, 2, 2, 6, 1, 1, 2].
+          End scores = (47, 20)
+          >>> print(turns[7])
+          Start scores = (47, 20).
+          Player 1 rolls 1 dice and gets outcomes [5].
+          End scores = (47, 25)
+          >>> print(turns[8])
+          Start scores = (47, 25).
+          Player 0 rolls 9 dice and gets outcomes [5, 6, 6, 6, 2, 1, 5, 6, 5].
+          End scores = (48, 25)
+          >>> print(turns[9])
+          Start scores = (48, 25).
+          Player 1 rolls 8 dice and gets outcomes [4, 2, 2, 4, 4, 6, 4, 1].
+          End scores = (48, 26)
+          >>> print(turns[10])
+          Start scores = (48, 26).
+          Player 0 rolls 3 dice and gets outcomes [1, 1, 5].
+          End scores = (49, 26)
+          >>> print(turns[11])
+          Start scores = (49, 26).
+          Player 1 rolls 1 dice and gets outcomes [1].
+          End scores = (49, 27)
+          >>> print(turns[12])
+          Start scores = (49, 27).
+          Player 0 rolls 7 dice and gets outcomes [1, 4, 4, 2, 3, 3, 2].
+          End scores = (50, 27)
+          >>> print(turns[13])
+          Start scores = (50, 27).
+          Player 1 rolls 4 dice and gets outcomes [6, 2, 3, 5].
+          End scores = (50, 43)
+          >>> print(turns[14])
+          Start scores = (50, 43).
+          Player 0 rolls 7 dice and gets outcomes [5, 4, 6, 5, 5, 1, 1].
+          End scores = (51, 43)
+          >>> print(turns[15])
+          Start scores = (51, 43).
+          Player 1 rolls 0 dice and gets outcomes [].
+          End scores = (51, 51)
+          >>> print(turns[16])
+          Start scores = (51, 51).
+          Player 1 rolls 6 dice and gets outcomes [2, 6, 6, 2, 1, 5].
+          End scores = (51, 52)
+          >>> print(turns[17])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=13464, score0=27, score1=4, goal=47)
+          >>> print(turns[0])
+          Start scores = (27, 4).
+          Player 0 rolls 4 dice and gets outcomes [3, 1, 5, 4].
+          End scores = (28, 4)
+          >>> print(turns[1])
+          Start scores = (28, 4).
+          Player 1 rolls 7 dice and gets outcomes [5, 3, 2, 5, 4, 5, 3].
+          End scores = (28, 31)
+          >>> print(turns[2])
+          Start scores = (28, 31).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (36, 31)
+          >>> print(turns[3])
+          Start scores = (36, 31).
+          Player 1 rolls 1 dice and gets outcomes [6].
+          End scores = (36, 37)
+          >>> print(turns[4])
+          Start scores = (36, 37).
+          Player 0 rolls 3 dice and gets outcomes [4, 1, 2].
+          End scores = (37, 37)
+          >>> print(turns[5])
+          Start scores = (37, 37).
+          Player 0 rolls 6 dice and gets outcomes [6, 2, 3, 4, 5, 3].
+          End scores = (60, 37)
+          >>> print(turns[6])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=92338, score0=64, score1=67, goal=69)
+          >>> print(turns[0])
+          Start scores = (64, 67).
+          Player 0 rolls 10 dice and gets outcomes [6, 2, 4, 4, 6, 4, 4, 6, 3, 4].
+          End scores = (107, 67)
           >>> print(turns[1])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=52065, score0=5, score1=34, goal=67, update=hog.square_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=55414, score0=9, score1=19, goal=32)
           >>> print(turns[0])
-          Start scores = (5, 34).
-          Player 0 rolls 10 dice and gets outcomes [5, 2, 6, 2, 4, 4, 5, 3, 1, 4].
-          End scores = (6, 34)
+          Start scores = (9, 19).
+          Player 0 rolls 8 dice and gets outcomes [1, 3, 2, 6, 1, 2, 5, 3].
+          End scores = (10, 19)
           >>> print(turns[1])
-          Start scores = (6, 34).
-          Player 1 rolls 4 dice and gets outcomes [3, 5, 2, 2].
-          End scores = (6, 46)
+          Start scores = (10, 19).
+          Player 1 rolls 10 dice and gets outcomes [4, 2, 4, 6, 1, 5, 1, 3, 2, 1].
+          End scores = (10, 20)
           >>> print(turns[2])
-          Start scores = (6, 46).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (10, 46)
+          Start scores = (10, 20).
+          Player 1 rolls 1 dice and gets outcomes [3].
+          End scores = (10, 23)
           >>> print(turns[3])
-          Start scores = (10, 46).
-          Player 1 rolls 8 dice and gets outcomes [5, 2, 6, 2, 3, 2, 3, 3].
-          End scores = (10, 72)
+          Start scores = (10, 23).
+          Player 0 rolls 10 dice and gets outcomes [4, 2, 6, 6, 6, 2, 2, 5, 4, 6].
+          End scores = (53, 23)
           >>> print(turns[4])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=49921, score0=0, score1=5, goal=17, update=hog.simple_update)
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=2412, score0=90, score1=38, goal=94)
           >>> print(turns[0])
-          Start scores = (0, 5).
-          Player 0 rolls 4 dice and gets outcomes [1, 1, 2, 4].
-          End scores = (1, 5)
+          Start scores = (90, 38).
+          Player 0 rolls 7 dice and gets outcomes [5, 3, 2, 6, 4, 1, 5].
+          End scores = (91, 38)
           >>> print(turns[1])
-          Start scores = (1, 5).
-          Player 1 rolls 3 dice and gets outcomes [6, 1, 5].
-          End scores = (1, 6)
+          Start scores = (91, 38).
+          Player 1 rolls 6 dice and gets outcomes [2, 3, 3, 5, 1, 6].
+          End scores = (91, 39)
           >>> print(turns[2])
-          Start scores = (1, 6).
-          Player 0 rolls 6 dice and gets outcomes [3, 1, 5, 5, 1, 4].
-          End scores = (2, 6)
+          Start scores = (91, 39).
+          Player 1 rolls 8 dice and gets outcomes [1, 1, 5, 1, 2, 6, 3, 1].
+          End scores = (91, 40)
           >>> print(turns[3])
-          Start scores = (2, 6).
-          Player 1 rolls 6 dice and gets outcomes [6, 4, 4, 4, 4, 3].
-          End scores = (2, 31)
+          Start scores = (91, 40).
+          Player 0 rolls 10 dice and gets outcomes [6, 5, 6, 1, 3, 1, 5, 6, 5, 4].
+          End scores = (92, 40)
+          >>> print(turns[4])
+          Start scores = (92, 40).
+          Player 1 rolls 7 dice and gets outcomes [6, 3, 1, 5, 6, 5, 3].
+          End scores = (92, 41)
+          >>> print(turns[5])
+          Start scores = (92, 41).
+          Player 0 rolls 8 dice and gets outcomes [5, 2, 4, 3, 1, 1, 5, 2].
+          End scores = (93, 41)
+          >>> print(turns[6])
+          Start scores = (93, 41).
+          Player 1 rolls 10 dice and gets outcomes [5, 2, 2, 5, 6, 5, 6, 4, 3, 3].
+          End scores = (93, 82)
+          >>> print(turns[7])
+          Start scores = (93, 82).
+          Player 0 rolls 2 dice and gets outcomes [6, 1].
+          End scores = (94, 82)
+          >>> print(turns[8])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=43957, score0=35, score1=51, goal=100)
+          >>> print(turns[0])
+          Start scores = (35, 51).
+          Player 0 rolls 6 dice and gets outcomes [2, 3, 4, 6, 3, 2].
+          End scores = (55, 51)
+          >>> print(turns[1])
+          Start scores = (55, 51).
+          Player 1 rolls 4 dice and gets outcomes [5, 3, 1, 1].
+          End scores = (55, 52)
+          >>> print(turns[2])
+          Start scores = (55, 52).
+          Player 0 rolls 1 dice and gets outcomes [3].
+          End scores = (58, 52)
+          >>> print(turns[3])
+          Start scores = (58, 52).
+          Player 1 rolls 4 dice and gets outcomes [5, 1, 1, 4].
+          End scores = (58, 53)
+          >>> print(turns[4])
+          Start scores = (58, 53).
+          Player 0 rolls 10 dice and gets outcomes [2, 5, 3, 3, 4, 5, 5, 3, 6, 6].
+          End scores = (100, 53)
+          >>> print(turns[5])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=36287, score0=42, score1=52, goal=100)
+          >>> print(turns[0])
+          Start scores = (42, 52).
+          Player 0 rolls 10 dice and gets outcomes [5, 4, 1, 5, 6, 4, 2, 3, 4, 4].
+          End scores = (43, 52)
+          >>> print(turns[1])
+          Start scores = (43, 52).
+          Player 1 rolls 10 dice and gets outcomes [3, 4, 6, 2, 4, 2, 4, 6, 4, 3].
+          End scores = (43, 90)
+          >>> print(turns[2])
+          Start scores = (43, 90).
+          Player 0 rolls 7 dice and gets outcomes [6, 4, 4, 6, 6, 4, 4].
+          End scores = (77, 90)
+          >>> print(turns[3])
+          Start scores = (77, 90).
+          Player 1 rolls 5 dice and gets outcomes [4, 4, 1, 6, 1].
+          End scores = (77, 91)
+          >>> print(turns[4])
+          Start scores = (77, 91).
+          Player 0 rolls 7 dice and gets outcomes [6, 2, 6, 5, 4, 1, 3].
+          End scores = (78, 91)
+          >>> print(turns[5])
+          Start scores = (78, 91).
+          Player 0 rolls 8 dice and gets outcomes [1, 3, 1, 1, 2, 2, 2, 2].
+          End scores = (79, 91)
+          >>> print(turns[6])
+          Start scores = (79, 91).
+          Player 1 rolls 5 dice and gets outcomes [2, 1, 5, 4, 5].
+          End scores = (79, 92)
+          >>> print(turns[7])
+          Start scores = (79, 92).
+          Player 0 rolls 0 dice and gets outcomes [].
+          End scores = (86, 92)
+          >>> print(turns[8])
+          Start scores = (86, 92).
+          Player 1 rolls 10 dice and gets outcomes [2, 3, 4, 1, 5, 4, 6, 6, 5, 3].
+          End scores = (86, 93)
+          >>> print(turns[9])
+          Start scores = (86, 93).
+          Player 0 rolls 10 dice and gets outcomes [5, 1, 3, 2, 5, 1, 2, 3, 1, 4].
+          End scores = (87, 93)
+          >>> print(turns[10])
+          Start scores = (87, 93).
+          Player 1 rolls 3 dice and gets outcomes [4, 1, 4].
+          End scores = (87, 94)
+          >>> print(turns[11])
+          Start scores = (87, 94).
+          Player 0 rolls 1 dice and gets outcomes [1].
+          End scores = (88, 94)
+          >>> print(turns[12])
+          Start scores = (88, 94).
+          Player 1 rolls 10 dice and gets outcomes [3, 2, 6, 2, 1, 6, 4, 4, 4, 2].
+          End scores = (88, 95)
+          >>> print(turns[13])
+          Start scores = (88, 95).
+          Player 0 rolls 5 dice and gets outcomes [1, 1, 4, 3, 1].
+          End scores = (89, 95)
+          >>> print(turns[14])
+          Start scores = (89, 95).
+          Player 1 rolls 5 dice and gets outcomes [4, 6, 5, 5, 4].
+          End scores = (89, 119)
+          >>> print(turns[15])
+          Game Over
+          """,
+          'hidden': False,
+          'locked': False
+        },
+        {
+          'code': r"""
+          >>> turns = tests.play_utils.describe_game(hog, hog_gui, test_number=36008, score0=3, score1=9, goal=11)
+          >>> print(turns[0])
+          Start scores = (3, 9).
+          Player 0 rolls 10 dice and gets outcomes [3, 3, 4, 3, 2, 1, 6, 5, 6, 5].
+          End scores = (4, 9)
+          >>> print(turns[1])
+          Start scores = (4, 9).
+          Player 1 rolls 10 dice and gets outcomes [1, 3, 5, 1, 3, 1, 3, 5, 6, 6].
+          End scores = (4, 10)
+          >>> print(turns[2])
+          Start scores = (4, 10).
+          Player 0 rolls 2 dice and gets outcomes [1, 4].
+          End scores = (5, 10)
+          >>> print(turns[3])
+          Start scores = (5, 10).
+          Player 1 rolls 8 dice and gets outcomes [6, 2, 3, 1, 6, 4, 4, 5].
+          End scores = (5, 11)
           >>> print(turns[4])
           Game Over
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=33242, score0=15, score1=34, goal=50, update=hog.simple_update)
-          >>> print(turns[0])
-          Start scores = (15, 34).
-          Player 0 rolls 10 dice and gets outcomes [6, 3, 1, 5, 5, 6, 4, 4, 4, 2].
-          End scores = (16, 34)
-          >>> print(turns[1])
-          Start scores = (16, 34).
-          Player 1 rolls 10 dice and gets outcomes [3, 5, 6, 5, 4, 5, 5, 1, 5, 2].
-          End scores = (16, 35)
-          >>> print(turns[2])
-          Start scores = (16, 35).
-          Player 0 rolls 10 dice and gets outcomes [4, 6, 1, 5, 4, 4, 2, 6, 2, 6].
-          End scores = (17, 35)
-          >>> print(turns[3])
-          Start scores = (17, 35).
-          Player 1 rolls 3 dice and gets outcomes [6, 4, 6].
-          End scores = (17, 51)
-          >>> print(turns[4])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> turns = tests.play_utils.describe_game(hog, test_number=67024, score0=59, score1=4, goal=60, update=hog.square_update)
-          >>> print(turns[0])
-          Start scores = (59, 4).
-          Player 0 rolls 1 dice and gets outcomes [4].
-          End scores = (63, 4)
-          >>> print(turns[1])
-          Game Over
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         }
       ],
       'scored': True,
@@ -3200,9 +3504,9 @@ test = {
       >>> # Plays a lot of random games, and calculates a secret value.
       >>> # Failing this test means something is wrong, but you should
       >>> # look at other tests to see where the problem might be.
-      >>> # Hint: make sure you're only calling update once per turn!
+      >>> # Hint: make sure you're only calling take_turn once per turn!
       >>> #
-      >>> import hog, importlib
+      >>> import hog, importlib, hog_gui
       >>> # importlib.reload(hog)
       >>> import tests.play_utils
       """,

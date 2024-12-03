@@ -5,17 +5,16 @@ test = {
     {
       'cases': [
         {
-          'answer': '562542d6415ecc5c5253297f5be4bea1',
+          'answer': '5eaa55d4501ab70024842f25d9ae70c4',
           'choices': [
-            'It contains a nested function',
-            'It calls a function that is not itself',
             'It takes in a function as an argument',
+            'It returns a function',
+            'It both takes in a function as an argument and returns a function',
             'It uses the *args keyword'
           ],
           'hidden': False,
           'locked': True,
-          'multiline': False,
-          'question': 'What is one reason that make_averaged is a higher order function?'
+          'question': 'What makes make_averaged a higher order function?'
         },
         {
           'answer': '159f99fb0e6b0dae968c6b227fa282ee',
@@ -26,7 +25,6 @@ test = {
           ],
           'hidden': False,
           'locked': True,
-          'multiline': False,
           'question': 'How many arguments does the function passed into make_averaged take?'
         }
       ],
@@ -45,8 +43,7 @@ test = {
           # locked
           """,
           'hidden': False,
-          'locked': True,
-          'multiline': False
+          'locked': True
         },
         {
           'code': r"""
@@ -59,8 +56,7 @@ test = {
           # locked
           """,
           'hidden': False,
-          'locked': True,
-          'multiline': False
+          'locked': True
         }
       ],
       'scored': True,
@@ -84,8 +80,7 @@ test = {
           50.0
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
@@ -95,8 +90,7 @@ test = {
           1.0
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
@@ -106,8 +100,7 @@ test = {
           5.0
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         }
       ],
       'scored': True,

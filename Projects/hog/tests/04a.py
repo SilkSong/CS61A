@@ -1,13 +1,13 @@
 test = {
-  'name': 'Question 10',
+  'name': 'Question 4a',
   'points': 1,
   'suites': [
     {
       'cases': [
         {
           'code': r"""
-          >>> bacon_strategy(0, 9, cutoff=8, num_rolls=5)
-          26f5762c932a578994ea1c8fc7fa6c02
+          >>> swine_align(2, 4)
+          d763fd836a7bfb096222e985b161b406
           # locked
           """,
           'hidden': False,
@@ -15,8 +15,8 @@ test = {
         },
         {
           'code': r"""
-          >>> bacon_strategy(9, 0, cutoff=6, num_rolls=5)
-          962aea5f59fc55bd65ccacf4603c8f22
+          >>> swine_align(11, 22)
+          bc6c4798917b91886d7fa5f56e42878f
           # locked
           """,
           'hidden': False,
@@ -24,8 +24,8 @@ test = {
         },
         {
           'code': r"""
-          >>> bacon_strategy(50, 2, cutoff=7, num_rolls=5)
-          962aea5f59fc55bd65ccacf4603c8f22
+          >>> swine_align(36, 24)
+          bc6c4798917b91886d7fa5f56e42878f
           # locked
           """,
           'hidden': False,
@@ -33,8 +33,8 @@ test = {
         },
         {
           'code': r"""
-          >>> bacon_strategy(32, 0, cutoff=8, num_rolls=4)
-          edcbd82ba98a8122be244fa325c62071
+          >>> swine_align(27, 13)
+          d763fd836a7bfb096222e985b161b406
           # locked
           """,
           'hidden': False,
@@ -42,8 +42,8 @@ test = {
         },
         {
           'code': r"""
-          >>> bacon_strategy(20, 1, cutoff=1, num_rolls=4)
-          962aea5f59fc55bd65ccacf4603c8f22
+          >>> swine_align(23, 22)
+          d763fd836a7bfb096222e985b161b406
           # locked
           """,
           'hidden': False,
@@ -51,818 +51,818 @@ test = {
         },
         {
           'code': r"""
-          >>> from tests.check_strategy import check_strategy
-          >>> check_strategy(bacon_strategy)
+          >>> swine_align(15, 45)
+          bc6c4798917b91886d7fa5f56e42878f
+          # locked
           """,
           'hidden': False,
-          'locked': False
-        }
-      ],
-      'scored': True,
-      'setup': r"""
-      >>> from hog import *
-      """,
-      'teardown': '',
-      'type': 'doctest'
-    },
-    {
-      'cases': [
+          'locked': True
+        },
+        {
+          'code': r"""
+          >>> swine_align(15, 0)
+          d763fd836a7bfb096222e985b161b406
+          # locked
+          """,
+          'hidden': False,
+          'locked': True
+        },
         {
           'code': r"""
-          >>> bacon_strategy(44, 47, 0, 4)
-          0
+          >>> swine_align(47, 64)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(37, 12, 8, 10)
-          0
+          >>> swine_align(12, 72)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(40, 15, 13, 9)
-          9
+          >>> swine_align(15, 72)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(24, 3, 8, 1)
-          1
+          >>> swine_align(24, 3)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(46, 55, 5, 2)
-          0
+          >>> swine_align(46, 55)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(99, 78, 15, 7)
-          7
+          >>> swine_align(91, 78)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(10, 73, 3, 5)
-          0
+          >>> swine_align(73, 99)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(47, 68, 3, 4)
-          0
+          >>> swine_align(23, 92)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(67, 84, 17, 10)
-          10
+          >>> swine_align(51, 68)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(92, 54, 1, 7)
-          0
+          >>> swine_align(92, 54)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(9, 15, 0, 2)
-          0
+          >>> swine_align(77, 22)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(25, 63, 16, 2)
-          2
+          >>> swine_align(48, 32)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(75, 27, 6, 2)
-          0
+          >>> swine_align(50, 80)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(82, 48, 10, 1)
-          1
+          >>> swine_align(48, 74)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(88, 12, 7, 10)
-          0
+          >>> swine_align(10, 10)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(72, 12, 5, 8)
-          0
+          >>> swine_align(12, 5)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(41, 69, 1, 5)
-          0
+          >>> swine_align(96, 16)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(15, 6, 16, 7)
-          7
+          >>> swine_align(26, 91)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(42, 19, 5, 2)
-          0
+          >>> swine_align(19, 69)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(93, 98, 8, 4)
-          0
+          >>> swine_align(93, 62)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(99, 90, 15, 10)
-          10
+          >>> swine_align(90, 15)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(73, 79, 4, 1)
-          0
+          >>> swine_align(48, 84)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(4, 44, 0, 5)
-          0
+          >>> swine_align(38, 19)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(83, 40, 9, 7)
-          7
+          >>> swine_align(57, 19)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(34, 3, 0, 8)
-          0
+          >>> swine_align(3, 64)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(4, 62, 15, 7)
-          7
+          >>> swine_align(62, 90)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(53, 62, 6, 1)
-          0
+          >>> swine_align(30, 15)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(19, 56, 8, 9)
-          0
+          >>> swine_align(33, 66)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(1, 5, 0, 4)
-          0
+          >>> swine_align(45, 60)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(85, 34, 8, 1)
-          0
+          >>> swine_align(96, 24)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(37, 37, 13, 5)
-          5
+          >>> swine_align(26, 78)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(82, 87, 16, 3)
-          3
+          >>> swine_align(87, 16)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(87, 43, 5, 7)
-          0
+          >>> swine_align(77, 11)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(20, 7, 2, 3)
-          0
+          >>> swine_align(7, 88)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(33, 85, 4, 4)
-          4
+          >>> swine_align(85, 68)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(73, 15, 12, 8)
-          8
+          >>> swine_align(76, 19)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(5, 98, 8, 2)
-          0
+          >>> swine_align(70, 80)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(15, 76, 3, 4)
-          0
+          >>> swine_align(28, 84)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(33, 75, 19, 5)
-          5
+          >>> swine_align(65, 13)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(9, 41, 0, 5)
-          0
+          >>> swine_align(20, 70)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(70, 91, 7, 6)
-          6
+          >>> swine_align(91, 7)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(64, 35, 12, 3)
-          3
+          >>> swine_align(35, 12)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(51, 92, 14, 8)
-          8
+          >>> swine_align(51, 92)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(68, 64, 17, 6)
-          6
+          >>> swine_align(64, 49)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(20, 35, 17, 4)
-          4
+          >>> swine_align(35, 45)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(75, 30, 3, 1)
-          0
+          >>> swine_align(24, 12)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(61, 69, 8, 5)
-          0
+          >>> swine_align(55, 22)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(7, 6, 7, 9)
-          9
+          >>> swine_align(42, 56)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(0, 51, 17, 5)
-          5
+          >>> swine_align(51, 81)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(42, 45, 8, 6)
-          0
+          >>> swine_align(45, 40)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(48, 96, 11, 2)
-          2
+          >>> swine_align(96, 11)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(57, 96, 9, 6)
-          0
+          >>> swine_align(57, 96)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(28, 11, 13, 8)
-          8
+          >>> swine_align(13, 65)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(25, 29, 5, 7)
-          0
+          >>> swine_align(44, 77)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(69, 2, 15, 8)
-          8
+          >>> swine_align(52, 13)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(77, 26, 7, 9)
-          0
+          >>> swine_align(26, 39)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(85, 15, 0, 3)
-          0
+          >>> swine_align(31, 31)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(79, 86, 5, 7)
-          0
+          >>> swine_align(98, 56)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(35, 32, 14, 6)
-          6
+          >>> swine_align(66, 99)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(49, 44, 13, 8)
-          8
+          >>> swine_align(44, 77)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(77, 65, 6, 4)
-          4
+          >>> swine_align(17, 34)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(99, 18, 2, 1)
-          0
+          >>> swine_align(15, 45)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(18, 24, 17, 10)
-          10
+          >>> swine_align(24, 81)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(44, 11, 18, 1)
-          1
+          >>> swine_align(11, 87)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(68, 38, 17, 5)
-          5
+          >>> swine_align(38, 54)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(46, 63, 8, 6)
-          6
+          >>> swine_align(63, 40)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(20, 60, 19, 6)
-          6
+          >>> swine_align(60, 51)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(67, 53, 10, 6)
-          6
+          >>> swine_align(60, 84)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(63, 39, 4, 1)
-          0
+          >>> swine_align(50, 75)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(54, 75, 9, 8)
-          0
+          >>> swine_align(75, 73)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(78, 86, 18, 9)
-          9
+          >>> swine_align(86, 24)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(45, 11, 8, 9)
-          0
+          >>> swine_align(48, 16)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(88, 19, 14, 6)
-          6
+          >>> swine_align(19, 46)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(22, 18, 14, 1)
-          1
+          >>> swine_align(18, 46)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(30, 91, 9, 10)
-          10
+          >>> swine_align(91, 9)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(19, 81, 8, 1)
-          0
+          >>> swine_align(19, 81)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(33, 7, 0, 2)
-          0
+          >>> swine_align(72, 60)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(87, 95, 11, 6)
-          6
+          >>> swine_align(63, 21)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(69, 86, 8, 10)
-          10
+          >>> swine_align(26, 13)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(87, 61, 10, 4)
-          4
+          >>> swine_align(54, 36)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(47, 60, 6, 4)
-          0
+          >>> swine_align(24, 24)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(67, 65, 14, 4)
-          4
+          >>> swine_align(48, 84)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(3, 66, 3, 7)
-          0
+          >>> swine_align(70, 70)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(82, 23, 8, 8)
-          8
+          >>> swine_align(23, 39)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(42, 89, 14, 1)
-          1
+          >>> swine_align(89, 56)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(32, 13, 4, 4)
-          0
+          >>> swine_align(32, 13)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(20, 96, 12, 4)
-          4
+          >>> swine_align(96, 44)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(77, 59, 15, 7)
-          7
+          >>> swine_align(77, 59)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(88, 32, 15, 2)
-          2
+          >>> swine_align(32, 79)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(19, 30, 4, 7)
-          0
+          >>> swine_align(30, 90)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(91, 29, 18, 4)
-          4
+          >>> swine_align(33, 77)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(50, 46, 10, 3)
-          3
+          >>> swine_align(46, 82)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(42, 67, 18, 7)
-          7
+          >>> swine_align(42, 67)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(37, 91, 4, 9)
-          0
+          >>> swine_align(52, 52)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(59, 82, 0, 6)
-          0
+          >>> swine_align(90, 75)
+          True
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(22, 41, 19, 7)
-          7
+          >>> swine_align(41, 19)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(84, 90, 6, 5)
-          0
+          >>> swine_align(90, 38)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(90, 35, 9, 4)
-          0
+          >>> swine_align(35, 51)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(90, 42, 1, 5)
-          0
+          >>> swine_align(42, 52)
+          False
           """,
           'hidden': False,
           'locked': False
         },
         {
           'code': r"""
-          >>> bacon_strategy(1, 35, 8, 10)
-          0
+          >>> swine_align(62, 62)
+          True
           """,
           'hidden': False,
           'locked': False

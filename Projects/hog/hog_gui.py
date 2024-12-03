@@ -1,14 +1,12 @@
 """Web server for the hog GUI."""
 import io
 import os
-import logging
 from contextlib import redirect_stdout
 
 from gui_files.common_server import route, start
 
 import hog
 import dice
-import default_graphics
 
 PORT = 31415
 DEFAULT_SERVER = "https://hog.cs61a.org"
@@ -26,58 +24,76 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
     fair_dice = dice.make_fair_dice(6)
     dice_results = []
 
-    square_swine = game_rules["Square Swine"]
-
-    def logged_dice():
-        if len(dice_results) < len(prev_rolls):
-            out = prev_rolls[len(dice_results)]
-        else:
-            out = fair_dice()
-        dice_results.append(out)
-        return out
-
-    final_scores = None
-    who = 0
-
-    move_cnt = 0
-
-    def strategy_for(player):
-        def strategy(*scores):
-            nonlocal final_scores, move_cnt, who
-            final_scores = scores
-            if player:
-                final_scores = final_scores[::-1]
-            who = player
-            if move_cnt == len(move_history):
-                raise HogLoggingException()
-            move = move_history[move_cnt]
-            move_cnt += 1
-            return move
-
-        return strategy
-
-    game_over = False
+    swine_align = game_rules["Swine Align"]
+    pig_pass = game_rules["Pig Pass"]
 
     try:
-        final_scores = trace_play(
-            hog.play,
-            strategy_for(0),
-            strategy_for(1),
-            hog.square_update if square_swine else hog.simple_update,
-            0,
-            0,
-            dice=logged_dice,
-            goal=goal,
-        )[:2]
-    except HogLoggingException:
-        pass
-    else:
-        game_over = True
+        if not swine_align:
+            old_swine_align, hog.swine_align = hog.swine_align, lambda score0, score1: False
+
+        if not pig_pass:
+            old_pig_pass, hog.pig_pass = hog.pig_pass, lambda score0, score1: False
+
+        def logged_dice():
+            if len(dice_results) < len(prev_rolls):
+                out = prev_rolls[len(dice_results)]
+            else:
+                out = fair_dice()
+            dice_results.append(out)
+            return out
+
+        final_scores = None
+        final_message = None
+        who = 0
+
+        commentary = hog.both(
+            hog.announce_highest(0),
+            hog.both(hog.announce_highest(1), hog.announce_lead_changes()),
+        )
+
+        def log(*logged_scores):
+            nonlocal final_message, commentary
+            f = io.StringIO()
+            with redirect_stdout(f):
+                commentary = commentary(*logged_scores)
+            final_message = f.getvalue()
+            return log
+
+        move_cnt = 0
+
+        def strategy_for(player):
+            def strategy(*scores):
+                nonlocal final_scores, move_cnt, who
+                final_scores = scores
+                if player:
+                    final_scores = final_scores[::-1]
+                who = player
+                if move_cnt == len(move_history):
+                    raise HogLoggingException()
+                move = move_history[move_cnt]
+                move_cnt += 1
+                return move
+            return strategy
+
+        game_over = False
+
+        try:
+            final_scores = trace_play(hog.play, strategy_for(0), strategy_for(1),
+                                      0, 0, dice=logged_dice, say=log, goal=goal)[:2]
+        except HogLoggingException:
+            pass
+        else:
+            game_over = True
+    finally:
+        if not swine_align:
+            hog.swine_align = old_swine_align
+        if not pig_pass:
+            hog.pig_pass = old_pig_pass
 
     return {
         "rolls": dice_results,
         "finalScores": final_scores,
-        "message": "",
+        "message": final_message,
         "gameOver": game_over,
         "who": who,
     }
@@ -86,24 +102,24 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
 @route
 def strategy(name, scores):
     STRATEGIES = {
-        "tail_strategy": hog.tail_strategy,
-        "square_strategy": hog.square_strategy,
+        "bacon_strategy": hog.bacon_strategy,
+        "extra_turn_strategy": hog.extra_turn_strategy,
         "final_strategy": hog.final_strategy,
     }
     return STRATEGIES[name](*scores[::-1])
 
+def safe(commentary):
+    def new_commentary(*args, **kwargs):
+        try:
+            result = commentary(*args, **kwargs)
+        except TypeError as e:
+            print("Error in commentary function")
+            result = commentary
+        return safe(result)
+    return new_commentary
 
-@route("dice_graphic.svg")
-def draw_dice_graphic(num):
-    num = int(num[0])
-    # Either draw student-provided dice or our default dice
-    if hasattr(hog, "draw_dice"):
-        graphic = hog.draw_dice(num)
-        return str(graphic)
-    return default_graphics.dice[num]
 
-
-def trace_play(play, strategy0, strategy1, update, score0, score1, dice, goal):
+def trace_play(play, strategy0, strategy1, score0, score1, dice, goal, say):
     """Wraps the user's play function and
         (1) ensures that strategy0 and strategy1 are called exactly once per turn
         (2) records the entire game, returning the result as a list of dictionaries,
@@ -143,14 +159,14 @@ def trace_play(play, strategy0, strategy1, update, score0, score1, dice, goal):
     s0, s1 = play(
         lambda a, b: mod_strategy(0, a, b),
         lambda a, b: mod_strategy(1, a, b),
-        update,
         score0,
         score1,
         dice=mod_dice,
         goal=goal,
+        say=safe(say),
     )
     return s0, s1, game_trace
 
 
-if __name__ == "__main__" or "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
+if __name__ == "__main__" or os.environ.get("ENV") == "prod":
     app = start(PORT, DEFAULT_SERVER, GUI_FOLDER)

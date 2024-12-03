@@ -1,10 +1,10 @@
-"""The Game of Hog."""
+"""CS 61A Presents The Game of Hog."""
 
-from dice import six_sided, make_test_dice
+from dice import six_sided, four_sided, make_test_dice
 from ucb import main, trace, interact
-from math import log2
 
-GOAL = 100  # The goal of Hog is to score 100 points.
+GOAL_SCORE = 100  # The goal of Hog is to score 100 points.
+FIRST_101_DIGITS_OF_PI = 31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679
 
 ######################
 # Phase 1: Simulator #
@@ -26,160 +26,244 @@ def roll_dice(num_rolls, dice=six_sided):
     # END PROBLEM 1
 
 
-def tail_points(opponent_score):
-    """Return the points scored by rolling 0 dice according to Pig Tail.
+def free_bacon(score):
+    """Return the points scored from rolling 0 dice (Free Bacon).
 
-    opponent_score:   The total score of the other player.
-
+    score:  The opponent's current score.
     """
+    assert score < 100, 'The game should be over.'
+    pi = FIRST_101_DIGITS_OF_PI
+
+    # Trim pi to only (score + 1) digit(s)
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
     # END PROBLEM 2
 
+    return pi % 10 + 3
+
 
 def take_turn(num_rolls, opponent_score, dice=six_sided):
-    """Return the points scored on a turn rolling NUM_ROLLS dice when the
-    opponent has OPPONENT_SCORE points.
+    """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
+    Return the points scored for the turn by the current player.
 
     num_rolls:       The number of dice rolls that will be made.
-    opponent_score:  The total score of the other player.
+    opponent_score:  The total score of the opponent.
     dice:            A function that simulates a single dice roll outcome.
     """
     # Leave these assert statements here; they help check for errors.
     assert type(num_rolls) == int, 'num_rolls must be an integer.'
     assert num_rolls >= 0, 'Cannot roll a negative number of dice in take_turn.'
     assert num_rolls <= 10, 'Cannot roll more than 10 dice.'
+    assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
     # END PROBLEM 3
 
 
-def simple_update(num_rolls, player_score, opponent_score, dice=six_sided):
-    """Return the total score of a player who starts their turn with
-    PLAYER_SCORE and then rolls NUM_ROLLS DICE, ignoring Square Swine.
+def extra_turn(player_score, opponent_score):
+    """Return whether the player gets an extra turn."""
+    return (pig_pass(player_score, opponent_score) or
+            swine_align(player_score, opponent_score))
+
+
+def swine_align(player_score, opponent_score):
+    """Return whether the player gets an extra turn due to Swine Align.
+
+    player_score:   The total score of the current player.
+    opponent_score: The total score of the other player.
+
+    >>> swine_align(30, 45)  # The GCD is 15.
+    True
+    >>> swine_align(35, 45)  # The GCD is 5.
+    False
     """
-    return player_score + take_turn(num_rolls, opponent_score, dice)
+    # BEGIN PROBLEM 4a
+    "*** YOUR CODE HERE ***"
+    # END PROBLEM 4a
 
 
-def square_update(num_rolls, player_score, opponent_score, dice=six_sided):
-    """Return the total score of a player who starts their turn with
-    PLAYER_SCORE and then rolls NUM_ROLLS DICE, *including* Square Swine.
+def pig_pass(player_score, opponent_score):
+    """Return whether the player gets an extra turn due to Pig Pass.
+
+    player_score:   The total score of the current player.
+    opponent_score: The total score of the other player.
+
+    >>> pig_pass(9, 12)
+    False
+    >>> pig_pass(10, 12)
+    True
+    >>> pig_pass(11, 12)
+    True
+    >>> pig_pass(12, 12)
+    False
+    >>> pig_pass(13, 12)
+    False
     """
-    score = player_score + take_turn(num_rolls, opponent_score, dice)
-    if perfect_square(score):  # Implement perfect_square
-        return next_perfect_square(score)  # Implement next_perfect_square
-    else:
-        return score
+    # BEGIN PROBLEM 4b
+    "*** YOUR CODE HERE ***"
+    # END PROBLEM 4b
 
 
-# BEGIN PROBLEM 4
-"*** YOUR CODE HERE ***"
-# END PROBLEM 4
+def other(who):
+    """Return the other player, for a player WHO numbered 0 or 1.
 
-
-def always_roll_5(score, opponent_score):
-    """A strategy of always rolling 5 dice, regardless of the player's score or
-    the oppononent's score.
+    >>> other(0)
+    1
+    >>> other(1)
+    0
     """
-    return 5
+    return 1 - who
 
 
-def play(strategy0, strategy1, update,
-         score0=0, score1=0, dice=six_sided, goal=GOAL):
-    """Simulate a game and return the final scores of both players, with
-    Player 0's score first and Player 1's score second.
+def silence(score0, score1):
+    """Announce nothing (see Phase 2)."""
+    return silence
 
-    E.g., play(always_roll_5, always_roll_5, square_update) simulates a game in
-    which both players always choose to roll 5 dice on every turn and the Square
-    Swine rule is in effect.
 
-    A strategy function, such as always_roll_5, takes the current player's
-    score and their opponent's score and returns the number of dice the current
-    player chooses to roll.
+def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
+         goal=GOAL_SCORE, say=silence):
+    """Simulate a game and return the final scores of both players, with Player
+    0's score first, and Player 1's score second.
 
-    An update function, such as square_update or simple_update, takes the number
-    of dice to roll, the current player's score, the opponent's score, and the
-    dice function used to simulate rolling dice. It returns the updated score
-    of the current player after they take their turn.
+    A strategy is a function that takes two total scores as arguments (the
+    current player's score, and the opponent's score), and returns a number of
+    dice that the current player will roll this turn.
 
-    strategy0: The strategy for player0.
-    strategy1: The strategy for player1.
-    update:    The update function (used for both players).
-    score0:    Starting score for Player 0
-    score1:    Starting score for Player 1
-    dice:      A function of zero arguments that simulates a dice roll.
-    goal:      The game ends and someone wins when this score is reached.
+    strategy0:  The strategy function for Player 0, who plays first.
+    strategy1:  The strategy function for Player 1, who plays second.
+    score0:     Starting score for Player 0
+    score1:     Starting score for Player 1
+    dice:       A function of zero arguments that simulates a dice roll.
+    goal:       The game ends and someone wins when this score is reached.
+    say:        The commentary function to call at the end of the first turn.
     """
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
     # END PROBLEM 5
+    # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
+    # BEGIN PROBLEM 6
+    "*** YOUR CODE HERE ***"
+    # END PROBLEM 6
     return score0, score1
 
 
 #######################
-# Phase 2: Strategies #
+# Phase 2: Commentary #
 #######################
 
 
-def always_roll(n):
-    """Return a player strategy that always rolls N dice.
+def say_scores(score0, score1):
+    """A commentary function that announces the score for each player."""
+    print("Player 0 now has", score0, "and Player 1 now has", score1)
+    return say_scores
 
-    A player strategy is a function that takes two total scores as arguments
-    (the current player's score, and the opponent's score), and returns a
-    number of dice that the current player will roll this turn.
 
-    >>> strategy = always_roll(3)
-    >>> strategy(0, 0)
-    3
-    >>> strategy(99, 99)
-    3
+def announce_lead_changes(last_leader=None):
+    """Return a commentary function that announces lead changes.
+
+    >>> f0 = announce_lead_changes()
+    >>> f1 = f0(5, 0)
+    Player 0 takes the lead by 5
+    >>> f2 = f1(5, 12)
+    Player 1 takes the lead by 7
+    >>> f3 = f2(8, 12)
+    >>> f4 = f3(8, 13)
+    >>> f5 = f4(15, 13)
+    Player 0 takes the lead by 2
     """
-    assert n >= 0 and n <= 10
-    # BEGIN PROBLEM 6
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 6
+    def say(score0, score1):
+        if score0 > score1:
+            leader = 0
+        elif score1 > score0:
+            leader = 1
+        else:
+            leader = None
+        if leader != None and leader != last_leader:
+            print('Player', leader, 'takes the lead by', abs(score0 - score1))
+        return announce_lead_changes(leader)
+    return say
 
 
-def catch_up(score, opponent_score):
-    """A player strategy that always rolls 5 dice unless the opponent
-    has a higher score, in which case 6 dice are rolled.
+def both(f, g):
+    """Return a commentary function that says what f says, then what g says.
 
-    >>> catch_up(9, 4)
-    5
-    >>> strategy(17, 18)
-    6
+    NOTE: the following game is not possible under the rules, it's just
+    an example for the sake of the doctest
+
+    >>> h0 = both(say_scores, announce_lead_changes())
+    >>> h1 = h0(10, 0)
+    Player 0 now has 10 and Player 1 now has 0
+    Player 0 takes the lead by 10
+    >>> h2 = h1(10, 8)
+    Player 0 now has 10 and Player 1 now has 8
+    >>> h3 = h2(10, 17)
+    Player 0 now has 10 and Player 1 now has 17
+    Player 1 takes the lead by 7
     """
-    if score < opponent_score:
-        return 6  # Roll one more to catch up
-    else:
-        return 5
+    def say(score0, score1):
+        return both(f(score0, score1), g(score0, score1))
+    return say
 
 
-def is_always_roll(strategy, goal=GOAL):
-    """Return whether strategy always chooses the same number of dice to roll.
+def announce_highest(who, last_score=0, running_high=0):
+    """Return a commentary function that announces when WHO's score
+    increases by more than ever before in the game.
 
-    >>> is_always_roll(always_roll_5)
-    True
-    >>> is_always_roll(always_roll(3))
-    True
-    >>> is_always_roll(catch_up)
-    False
+    NOTE: the following game is not possible under the rules, it's just
+    an example for the sake of the doctest
+
+    >>> f0 = announce_highest(1) # Only announce Player 1 score gains
+    >>> f1 = f0(12, 0)
+    >>> f2 = f1(12, 9)
+    9 point(s)! The most yet for Player 1
+    >>> f3 = f2(20, 9)
+    >>> f4 = f3(20, 30)
+    21 point(s)! The most yet for Player 1
+    >>> f5 = f4(20, 47) # Player 1 gets 17 points; not enough for a new high
+    >>> f6 = f5(21, 47)
+    >>> f7 = f6(21, 77)
+    30 point(s)! The most yet for Player 1
     """
+    assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
     # END PROBLEM 7
 
 
-def make_averaged(original_function, total_samples=1000):
-    """Return a function that returns the average value of ORIGINAL_FUNCTION
-    called TOTAL_SAMPLES times.
+#######################
+# Phase 3: Strategies #
+#######################
 
-    To implement this function, you will have to use *args syntax.
+
+def always_roll(n):
+    """Return a strategy that always rolls N dice.
+
+    A strategy is a function that takes two total scores as arguments (the
+    current player's score, and the opponent's score), and returns a number of
+    dice that the current player will roll this turn.
+
+    >>> strategy = always_roll(5)
+    >>> strategy(0, 0)
+    5
+    >>> strategy(99, 99)
+    5
+    """
+    def strategy(score, opponent_score):
+        return n
+    return strategy
+
+
+def make_averaged(original_function, trials_count=1000):
+    """Return a function that returns the average value of ORIGINAL_FUNCTION
+    when called.
+
+    To implement this function, you will have to use *args syntax, a new Python
+    feature introduced in this project.  See the project description.
 
     >>> dice = make_test_dice(4, 2, 5, 1)
-    >>> averaged_dice = make_averaged(roll_dice, 40)
-    >>> averaged_dice(1, dice)  # The avg of 10 4's, 10 2's, 10 5's, and 10 1's
+    >>> averaged_dice = make_averaged(dice, 1000)
+    >>> averaged_dice()
     3.0
     """
     # BEGIN PROBLEM 8
@@ -187,9 +271,9 @@ def make_averaged(original_function, total_samples=1000):
     # END PROBLEM 8
 
 
-def max_scoring_num_rolls(dice=six_sided, total_samples=1000):
-    """Return the number of dice (1 to 10) that gives the highest average turn score
-    by calling roll_dice with the provided DICE a total of TOTAL_SAMPLES times.
+def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
+    """Return the number of dice (1 to 10) that gives the highest average turn
+    score by calling roll_dice with the provided DICE over TRIALS_COUNT times.
     Assume that the dice always return positive outcomes.
 
     >>> dice = make_test_dice(1, 6)
@@ -203,7 +287,7 @@ def max_scoring_num_rolls(dice=six_sided, total_samples=1000):
 
 def winner(strategy0, strategy1):
     """Return 0 if strategy0 wins against strategy1, and 1 otherwise."""
-    score0, score1 = play(strategy0, strategy1, square_update)
+    score0, score1 = play(strategy0, strategy1)
     if score0 > score1:
         return 0
     else:
@@ -222,33 +306,42 @@ def average_win_rate(strategy, baseline=always_roll(6)):
 
 def run_experiments():
     """Run a series of strategy experiments and report results."""
-    six_sided_max = max_scoring_num_rolls(six_sided)
-    print('Max scoring num rolls for six-sided dice:', six_sided_max)
+    if True:  # Change to False when done finding max_scoring_num_rolls
+        six_sided_max = max_scoring_num_rolls(six_sided)
+        print('Max scoring num rolls for six-sided dice:', six_sided_max)
 
-    print('always_roll(6) win rate:', average_win_rate(always_roll(6)))  # near 0.5
-    print('catch_up win rate:', average_win_rate(catch_up))
-    print('always_roll(3) win rate:', average_win_rate(always_roll(3)))
-    print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
+    if False:  # Change to True to test always_roll(8)
+        print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
 
-    print('tail_strategy win rate:', average_win_rate(tail_strategy))
-    print('square_strategy win rate:', average_win_rate(square_strategy))
-    print('final_strategy win rate:', average_win_rate(final_strategy))
+    if False:  # Change to True to test bacon_strategy
+        print('bacon_strategy win rate:', average_win_rate(bacon_strategy))
+
+    if False:  # Change to True to test extra_turn_strategy
+        print('extra_turn_strategy win rate:', average_win_rate(extra_turn_strategy))
+
+    if False:  # Change to True to test final_strategy
+        print('final_strategy win rate:', average_win_rate(final_strategy))
+
     "*** You may add additional experiments as you wish ***"
 
 
-def tail_strategy(score, opponent_score, threshold=12, num_rolls=6):
-    """This strategy returns 0 dice if Pig Tail gives at least THRESHOLD
-    points, and returns NUM_ROLLS otherwise. Ignore score and Square Swine.
+
+def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
+    """This strategy rolls 0 dice if that gives at least CUTOFF points, and
+    rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return num_rolls  # Remove this line once implemented.
+    return 6  # Replace this statement
     # END PROBLEM 10
 
 
-def square_strategy(score, opponent_score, threshold=12, num_rolls=6):
-    """This strategy returns 0 dice when your score would increase by at least threshold."""
+def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):
+    """This strategy rolls 0 dice when it triggers an extra turn. It also
+    rolls 0 dice if it gives at least CUTOFF points and does not give an extra turn.
+    Otherwise, it rolls NUM_ROLLS.
+    """
     # BEGIN PROBLEM 11
-    return num_rolls  # Remove this line once implemented.
+    return 6  # Replace this statement
     # END PROBLEM 11
 
 
@@ -258,16 +351,16 @@ def final_strategy(score, opponent_score):
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 6  # Remove this line once implemented.
+    return 6  # Replace this statement
     # END PROBLEM 12
-
 
 ##########################
 # Command Line Interface #
 ##########################
 
-# NOTE: The function in this section does not need to be changed. It uses
-# features of Python not yet covered in the course.
+# NOTE: Functions in this section do not need to be changed. They use features
+# of Python not yet covered in the course.
+
 
 @main
 def run(*args):

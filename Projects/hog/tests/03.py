@@ -6,105 +6,79 @@ test = {
       'cases': [
         {
           'code': r"""
-          >>> take_turn(2, 7, make_test_dice(4, 5, 1))
+          >>> take_turn(2, 0, make_test_dice(4, 5, 1))
           872dbe4a4fe5d8451aa842c21194c866
           # locked
           """,
           'hidden': False,
-          'locked': True,
-          'multiline': False
+          'locked': True
         },
         {
           'code': r"""
-          >>> take_turn(3, 14, make_test_dice(4, 6, 1))
+          >>> take_turn(3, 0, make_test_dice(4, 6, 1))
           43d176e102c8d95338faf8791aa509b3
           # locked
           """,
           'hidden': False,
-          'locked': True,
-          'multiline': False
+          'locked': True
         },
         {
           'code': r"""
-          >>> take_turn(0, 41)
+          >>> take_turn(0, 2)
           c42887e7b9ffe8fc26bb57b61329f916
           # locked
           """,
           'hidden': False,
-          'locked': True,
-          'multiline': False
+          'locked': True
         },
         {
           'code': r"""
-          >>> take_turn(0, 15)
-          9
+          >>> take_turn(0, 0)
+          327b19ffebddf93982e1ad2a4a6486f4
+          # locked
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': True
         },
         {
           'code': r"""
-          >>> take_turn(0, 21)
-          3
+          >>> take_turn(0, 1)
+          4
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> take_turn(2, 15, make_test_dice(6))
+          >>> take_turn(2, 0, make_test_dice(6))
           12
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> take_turn(9, 2, make_test_dice(4))
+          >>> take_turn(9, 0, make_test_dice(4))
           36
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> take_turn(7, 4, make_test_dice(4))
+          >>> take_turn(7, 0, make_test_dice(4))
           28
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         },
         {
           'code': r"""
-          >>> take_turn(8, 3, make_test_dice(5))
+          >>> take_turn(8, 0, make_test_dice(5))
           40
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> take_turn(1, 3, make_test_dice(5, 1))
-          5
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
-        },
-        {
-          'code': r"""
-          >>> take_turn(2, 3, make_test_dice(5, 1))
-          1
-          """,
-          'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         }
       ],
       'scored': True,
@@ -123,8 +97,7 @@ test = {
           9002
           """,
           'hidden': False,
-          'locked': False,
-          'multiline': False
+          'locked': False
         }
       ],
       'scored': True,
